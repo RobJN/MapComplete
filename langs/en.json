@@ -193,6 +193,9 @@
       "downloadGeojson": "Download visible data as GeoJSON",
       "downloadGpx":"Download as GPX-file",
       "downloadGpxHelper":"A GPX-file can be used with most navigation devices and applications",
+      "downloadSvg": "Download as SVG-file",
+      "downloadSvgHelper": "Compatible with graphical programs, e.g. in Adobe Illustrator, InkScape, Figma, ...",
+
       "uploadGpx":"Upload your track to OpenStreetMap",
 
       "exporting": "Exporting…",

@@ -13,6 +13,7 @@ import {UIEventSource} from "../../Logic/UIEventSource";
 import SimpleMetaTagger from "../../Logic/SimpleMetaTagger";
 import LayoutConfig from "../../Models/ThemeConfig/LayoutConfig";
 import {BBox} from "../../Logic/BBox";
+import geojson2svg from "geojson2svg"
 
 export class DownloadPanel extends Toggle {
 
@@ -32,8 +33,8 @@ export class DownloadPanel extends Toggle {
 
 
         const buttonGeoJson = new SubtleButton(Svg.floppy_ui(),
-            new Combine([t.downloadGeojson.Clone().SetClass("font-bold"),
-                t.downloadGeoJsonHelper.Clone()]).SetClass("flex flex-col"))
+            new Combine([t.downloadGeojson.SetClass("font-bold"),
+                t.downloadGeoJsonHelper]).SetClass("flex flex-col"))
             .onClick(() => {
                 const geojson = DownloadPanel.getCleanGeoJson(state, metaisIncluded.data)
                 Utils.offerContentsAsDownloadableFile(JSON.stringify(geojson, null, "  "),
@@ -43,9 +44,47 @@ export class DownloadPanel extends Toggle {
             })
 
 
+        const buttonSvg = new SubtleButton(Svg.floppy_ui(), new Combine([
+            t.downloadSvg.SetClass("font-bold"),
+            t.downloadSvgHelper
+        ]).SetClass("flex flex-col"))
+            .onClick(() => {
+                const geojson = {...DownloadPanel.getCleanGeoJson(state, metaisIncluded.data)}
+
+                const bbox = state.currentBounds.data
+                const converter = geojson2svg()
+                const paths = []
+                const width = 2500
+                const height = 2500
+                for (const feature of geojson.features) {
+                    feature.geometry.coordinates = DownloadPanel.rescale(feature.geometry.coordinates, bbox)
+                    const pathDescription = converter.convert(feature, {
+                        viewportSize:{
+                            width, height
+                        },
+                        output: 'path',
+                    })
+                    const layer = state.layoutToUse.getMatchingLayer(feature.properties)
+                    for (const mr of layer.lineRendering) {
+                        const rendering = mr.GenerateLeafletStyle(feature.presets)
+                        const path = `<path d="${pathDescription}" style="fill:${rendering.fill ?? "none"};fill-opacity:${1};stroke:${rendering.color};stroke-width:${rendering.weight};stroke-opacity:1;stroke-linecap:${rendering.lineCap ?? "butt"}" id="${feature.properties.id}" />`
+                        paths.push(path)
+                    }
+                }
+
+
+                const svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">\n\t${paths.join("\n\t")}</svg>`
+                console.log("SVG is", svg)
+                Utils.offerContentsAsDownloadableFile(svg, `MapComplete_${name}_export_${new Date().toISOString().substr(0, 19)}.svg`,
+                    {
+                        mimetype: "image/svg+xml"
+                    })
+            })
+
+
         const buttonCSV = new SubtleButton(Svg.floppy_ui(), new Combine(
-            [t.downloadCSV.Clone().SetClass("font-bold"),
-                t.downloadCSVHelper.Clone()]).SetClass("flex flex-col"))
+            [t.downloadCSV.SetClass("font-bold"),
+                t.downloadCSVHelper]).SetClass("flex flex-col"))
             .onClick(() => {
                 const geojson = DownloadPanel.getCleanGeoJson(state, metaisIncluded.data)
                 const csv = GeoOperations.toCSV(geojson.features)
@@ -60,14 +99,32 @@ export class DownloadPanel extends Toggle {
             [new Title(t.title),
                 buttonGeoJson,
                 buttonCSV,
+                buttonSvg,
                 includeMetaToggle,
-                t.licenseInfo.Clone().SetClass("link-underline")])
+                t.licenseInfo.SetClass("link-underline")])
             .SetClass("w-full flex flex-col border-4 border-gray-300 rounded-3xl p-4")
 
         super(
             downloadButtons,
-            t.noDataLoaded.Clone(),
+            t.noDataLoaded,
             state.featurePipeline.somethingLoaded)
+    }
+
+    private static rescale(coordinates: [number, number] | [number, number] [] | [number, number] [][], bbox: BBox): ([number, number] | [number, number] [] | [number, number] [][]) {
+        if (typeof coordinates[0] === "number") {
+
+            const lon = coordinates[0]
+            const lat = <number>coordinates[1]
+            return [
+                (100000000 * (lon - bbox.minLon)) / (bbox.maxLon - bbox.minLon),
+                (100000000 * (lat - bbox.minLat)) / (bbox.maxLat - bbox.minLat)
+            ]
+        } else {
+            // @ts-ignore
+            return coordinates.map(c => DownloadPanel.rescale(c, bbox))
+        }
+
+
     }
 
     private static getCleanGeoJson(state: {
@@ -81,7 +138,7 @@ export class DownloadPanel extends Toggle {
             for (const feature of tile) {
                 const cleaned = {
                     type: feature.type,
-                    geometry: feature.geometry,
+                    geometry: {...feature.geometry},
                     properties: {...feature.properties}
                 }
 

@@ -73,6 +73,7 @@
     "country-language": "^0.1.7",
     "email-validator": "^2.0.4",
     "escape-html": "^1.0.3",
+    "geojson2svg": "^1.2.8",
     "i18next-client": "^1.11.4",
     "idb-keyval": "^6.0.3",
     "jquery": "^3.6.0",
