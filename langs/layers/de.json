@@ -1,4 +1,78 @@
 {
+    "address": {
+        "description": "Adressen",
+        "name": "Bekannte Adressen in OSM",
+        "tagRenderings": {
+            "fixme": {
+                "question": "Was sollte hier korrigiert werden? Bitte erläutern"
+            },
+            "housenumber": {
+                "mappings": {
+                    "0": {
+                        "then": "Dieses Gebäude hat keine Hausnummer"
+                    }
+                },
+                "question": "Wie lautet die Nummer dieses Hauses?",
+                "render": "Die Hausnummer ist <b>{addr:housenumber}</b>"
+            },
+            "street": {
+                "question": "In welcher Straße befindet sich diese Adresse?",
+                "render": "Diese Adresse befindet sich in der Straße <b>{addr:street}</b>"
+            }
+        },
+        "title": {
+            "render": "Bekannte Adresse"
+        }
+    },
+    "ambulancestation": {
+        "description": "Eine Rettungswache ist ein Ort, an dem Rettungsfahrzeuge, medizinische Ausrüstung, persönliche Schutzausrüstung und anderes medizinisches Material untergebracht sind.",
+        "name": "Karte der Rettungswachen",
+        "presets": {
+            "0": {
+                "description": "Eine Rettungsstation der Karte hinzufügen",
+                "title": "Rettungswache"
+            }
+        },
+        "tagRenderings": {
+            "ambulance-agency": {
+                "question": "Welches Unternehmen betreibt diese Rettungswache?",
+                "render": "Diese Rettungswache wird betrieben von {operator}."
+            },
+            "ambulance-name": {
+                "question": "Wie heißt diese Rettungswache?",
+                "render": "Diese Rettungswache heißt {name}."
+            },
+            "ambulance-operator-type": {
+                "mappings": {
+                    "0": {
+                        "then": "Die Rettungswache wird von einer Behörde betrieben."
+                    },
+                    "1": {
+                        "then": "Die Rettungswache wird von einer gemeindenahen oder informellen Organisation betrieben."
+                    },
+                    "2": {
+                        "then": "Die Rettungswache wird von einer Freiwilligenorganisation betrieben."
+                    },
+                    "3": {
+                        "then": "Die Rettungswache wird von einer privaten Organisation betrieben."
+                    }
+                },
+                "question": "Wie kann der Betreiber der Rettungswache eingestuft werden?",
+                "render": "Der Betreiber ist eine {operator:type}."
+            },
+            "ambulance-place": {
+                "question": "Wo befindet sich die Rettungswache? (z. B. Name von Stadtviertel, Dorf oder Stadt)",
+                "render": "Diese Rettungswache befindet sich in {addr:place}."
+            },
+            "ambulance-street": {
+                "question": " Wie lautet der Name der Straße, in der sich die Rettungswache befindet?",
+                "render": "Dieser Bahnhof liegt an der Straße {addr:street}."
+            }
+        },
+        "title": {
+            "render": "Rettungswache"
+        }
+    },
     "artwork": {
         "description": "Verschiedene Kunstwerke",
         "name": "Kunstwerke",
@@ -258,10 +332,17 @@
         "tagRenderings": {
             "bench_at_pt-bench_type": {
                 "mappings": {
+                    "0": {
+                        "then": "Hier gibt es eine normale Sitzbank"
+                    },
                     "1": {
                         "then": "Stehbank"
+                    },
+                    "2": {
+                        "then": "Hier gibt es keine Bank"
                     }
-                }
+                },
+                "question": "Was ist das für eine Bank?"
             },
             "bench_at_pt-name": {
                 "render": "{name}"
@@ -426,6 +507,38 @@
                 "title": "Fahrrad-Reinigungsdienst"
             }
         },
+        "tagRenderings": {
+            "bike_cleaning-charge": {
+                "mappings": {
+                    "0": {
+                        "then": "Kostenloser Reinigungsservice"
+                    },
+                    "1": {
+                        "then": "Kostenlose Nutzung"
+                    },
+                    "2": {
+                        "then": "Der Reinigungsservice ist kostenpflichtig"
+                    }
+                },
+                "question": "Wie viel kostet die Nutzung des Reinigungsdienstes?",
+                "render": "Die Nutzung des Reinigungsdienstes kostet {charge}"
+            },
+            "bike_cleaning-service:bicycle:cleaning:charge": {
+                "mappings": {
+                    "0": {
+                        "then": "Der Reinigungsservice ist kostenlos"
+                    },
+                    "1": {
+                        "then": "Kostenlose Nutzung"
+                    },
+                    "2": {
+                        "then": "Der Reinigungsdienst ist kostenpflichtig, aber der Betrag ist nicht bekannt"
+                    }
+                },
+                "question": "Wie viel kostet die Nutzung des Reinigungsdienstes?",
+                "render": "Nutzung des Reinigungsservice kostet {service:bicycle:cleaning:charge}"
+            }
+        },
         "title": {
             "mappings": {
                 "0": {
@@ -563,7 +676,7 @@
         },
         "tagRenderings": {
             "Email maintainer": {
-                "render": "<a href='mailto:{email}?subject=Fahrradpumpe kaputt&body=Hallo,\n\nMit dieser E-Mail möchte ich Ihnen mitteilen, dass die Fahrradpumpe, die sich unter https://mapcomplete.osm.be/cyclofix?lat={_lat}&lon={_lon}&z=18#{id} befindet, kaputt ist.'>Melde diese Fahrradpumpe als kaputt</a>"
+                "render": "<a href='mailto:{email}?subject=Fahrradpumpe kaputt&body=Hallo,%0D%0A%0D%0AMit dieser E-Mail möchte ich Ihnen mitteilen, dass die Fahrradpumpe, die sich unter https://mapcomplete.osm.be/cyclofix?lat={_lat}%26lon={_lon}%26z=18%23{id} befindet, kaputt ist.'>Melde diese Fahrradpumpe als kaputt</a>"
             },
             "Operational status": {
                 "mappings": {
@@ -926,6 +1039,176 @@
             }
         }
     },
+    "charging_station": {
+        "description": "Eine Ladestation",
+        "filter": {
+            "0": {
+                "options": {
+                    "0": {
+                        "question": "Alle Fahrzeugtypen"
+                    },
+                    "1": {
+                        "question": "Ladestation für Fahrräder"
+                    },
+                    "2": {
+                        "question": "Ladestation für Autos"
+                    }
+                }
+            },
+            "1": {
+                "options": {
+                    "0": {
+                        "question": "Nur funktionierende Ladestationen"
+                    }
+                }
+            },
+            "2": {
+                "options": {
+                    "0": {
+                        "question": "Alle Anschlüsse"
+                    },
+                    "1": {
+                        "question": "Verfügt über einen <div style='display: inline-block'><b><b>Schuko-Stecker</b> ohne Erdungsstift (CEE7/4 Typ F)</b><img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/CEE7_4F.svg'/></div>"
+                    },
+                    "3": {
+                        "question": "Verfügt über einen <div style='display: inline-block'><b><b>Chademo</b></b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Chademo_type4.svg'/></div> Stecker"
+                    },
+                    "4": {
+                        "question": "Verfügt über einen <div style='display: inline-block'><b><b>Typ 1 </b> (J1772)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type1_J1772.svg'/></div> Stecker mit Kabel"
+                    },
+                    "5": {
+                        "question": "Verfügt über einen <div style='display: inline-block'><b><b>Typ 1 (J1772) <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type1_J1772.svg'/></div> Stecker <i>ohne</i> Kabel</b>"
+                    },
+                    "6": {
+                        "question": "Verfügt über einen <div style='display: inline-block'><b><b>Typ 1 CCS <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type1-ccs.svg'/></div> Stecker, auch bekannt als Typ 1 Combo</b>"
+                    },
+                    "7": {
+                        "question": "Verfügt über einen <div style='display: inline-block'><b><b>Tesla Supercharger</b></b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Tesla-hpwc-model-s.svg'/></div> Stecker"
+                    }
+                }
+            }
+        },
+        "name": "Ladestationen",
+        "presets": {
+            "1": {
+                "title": "Ladestation für e-bikes"
+            }
+        },
+        "tagRenderings": {
+            "Authentication": {
+                "mappings": {
+                    "0": {
+                        "then": "Authentifizierung per Mitgliedskarte"
+                    },
+                    "1": {
+                        "then": "Authentifizierung per App"
+                    },
+                    "2": {
+                        "then": "Authentifizierung per Anruf ist möglich"
+                    },
+                    "3": {
+                        "then": "Authentifizierung per SMS ist möglich"
+                    },
+                    "4": {
+                        "then": "Authentifizierung per NFC ist möglich"
+                    },
+                    "5": {
+                        "then": "Authentifizierung per Geldkarte ist möglich"
+                    },
+                    "6": {
+                        "then": "Authentifizierung per Kreditkarte ist möglich"
+                    },
+                    "7": {
+                        "then": "Das Laden ist hier (auch) ohne Authentifizierung möglich"
+                    }
+                },
+                "question": "Welche Art der Authentifizierung ist an der Ladestation möglich?"
+            },
+            "Available_charging_stations (generated)": {
+                "question": "Welche Ladeanschlüsse gibt es hier?"
+            },
+            "Network": {
+                "mappings": {
+                    "0": {
+                        "then": "Nicht Teil eines größeren Netzwerks, z. B. weil die Ladestation von einem lokalen Unternehmen betrieben wird"
+                    },
+                    "1": {
+                        "then": "Nicht Teil eines größeren Netzwerks"
+                    }
+                },
+                "question": "Ist diese Ladestation Teil eines Netzwerks?",
+                "render": "Teil des Netzwerks <b>{network}</b>"
+            },
+            "OH": {
+                "mappings": {
+                    "0": {
+                        "then": "durchgehend geöffnet (einschließlich Feiertage)"
+                    }
+                },
+                "question": "Wann ist diese Ladestation geöffnet?"
+            },
+            "Operational status": {
+                "mappings": {
+                    "0": {
+                        "then": "Diese Ladestation ist betriebsbereit"
+                    },
+                    "1": {
+                        "then": "Diese Ladestation ist defekt"
+                    },
+                    "2": {
+                        "then": "Hier ist eine Ladestation geplant"
+                    },
+                    "3": {
+                        "then": "Hier wird eine Ladestation errichtet"
+                    },
+                    "4": {
+                        "then": "Diese Ladestation wurde dauerhaft geschlossen und wird nicht mehr benutzt, ist aber noch sichtbar"
+                    }
+                },
+                "question": "Ist dieser Ladepunkt in Betrieb?"
+            },
+            "Operator": {
+                "mappings": {
+                    "0": {
+                        "then": "Eigentlich ist {operator} das Netzwerk"
+                    }
+                },
+                "question": "Wer ist der Betreiber dieser Ladestation?",
+                "render": "Diese Ladestation wird betrieben von {operator}"
+            },
+            "Parking:fee": {
+                "mappings": {
+                    "0": {
+                        "then": "Keine zusätzlichen Parkkosten während des Ladens"
+                    },
+                    "1": {
+                        "then": "Während des Ladens ist eine zusätzliche Parkgebühr zu entrichten"
+                    }
+                },
+                "question": "Muss man während des Ladens eine Parkgebühr bezahlen?"
+            },
+            "Type": {
+                "mappings": {
+                    "0": {
+                        "then": "<b>Fahrräder</b> können hier geladen werden"
+                    },
+                    "1": {
+                        "then": "<b>Autos</b> können hier geladen werden"
+                    },
+                    "2": {
+                        "then": "<b>Roller</b> können hier geladen werden"
+                    },
+                    "3": {
+                        "then": "<b>LKW</b> können hier geladen werden"
+                    },
+                    "4": {
+                        "then": "<b>Busse</b> können hier geladen werden"
+                    }
+                },
+                "question": "Welche Fahrzeuge dürfen hier laden?"
+            }
+        }
+    },
     "crossings": {
         "description": "Übergänge für Fußgänger und Radfahrer",
         "name": "Kreuzungen",
@@ -957,7 +1240,7 @@
                         "then": "Diese Ampel hat eine Taste, um ein grünes Signal anzufordern"
                     },
                     "1": {
-                        "then": "Diese Ampel hat keine Taste, um ein grünes Signal anzufordern."
+                        "then": "Diese Ampel hat keine Taste, um ein grünes Signal anzufordern"
                     }
                 },
                 "question": "Hat diese Ampel eine Taste, um ein grünes Signal anzufordern?"
@@ -1559,7 +1842,7 @@
                     }
                 },
                 "question": "Ist diese Trinkwasserstelle noch in Betrieb?",
-                "render": "Der Betriebsstatus ist <i>{operational_status}/i>"
+                "render": "Der Betriebsstatus ist <i>{operational_status}</i>"
             },
             "render-closest-drinking-water": {
                 "render": "<a href='#{_closest_other_drinking_water_id}'>Ein weiterer Trinkwasserbrunnen befindet sich in {_closest_other_drinking_water_distance} Meter</a>"
@@ -1586,6 +1869,58 @@
                 "question": "Was ist das Wikidata-Element, nach dem dieses Objekt benannt ist?",
                 "render": "<h3>Wikipedia Artikel zur Namensherkunft</h3>{wikipedia(name:etymology:wikidata):max-height:20rem}"
             }
+        }
+    },
+    "extinguisher": {
+        "description": "Kartenebene zur Anzeige von Hydranten.",
+        "name": "Karte mit Feuerlöschern.",
+        "presets": {
+            "0": {
+                "description": "Ein Feuerlöscher ist ein kleines, tragbares Gerät, das dazu dient, ein Feuer zu löschen",
+                "title": "Feuerlöscher"
+            }
+        },
+        "tagRenderings": {
+            "extinguisher-location": {
+                "mappings": {
+                    "0": {
+                        "then": "Im Innenraum vorhanden."
+                    },
+                    "1": {
+                        "then": "Im Außenraum vorhanden."
+                    }
+                },
+                "question": "Wo befindet er sich?",
+                "render": "Standort: {location}"
+            }
+        },
+        "title": {
+            "render": "Feuerlöscher"
+        }
+    },
+    "fire_station": {
+        "description": "Kartenebene zur Darstellung von Feuerwachen.",
+        "name": "Karte der Feuerwachen",
+        "presets": {
+            "0": {
+                "description": "Eine Feuerwache ist ein Ort, an dem die Feuerwehrfahrzeuge und die Feuerwehrleute untergebracht sind, wenn sie nicht im Einsatz sind.",
+                "title": "Feuerwache"
+            }
+        },
+        "tagRenderings": {
+            "station-agency": {
+                "mappings": {
+                    "0": {
+                        "then": "Brandschutzbehörde"
+                    }
+                }
+            },
+            "station-name": {
+                "question": "Wie lautet der Name dieser Feuerwache?"
+            }
+        },
+        "title": {
+            "render": "Feuerwache"
         }
     },
     "food": {
@@ -1756,6 +2091,71 @@
                 }
             },
             "render": "Geisterrad"
+        }
+    },
+    "hydrant": {
+        "description": "Kartenebene zur Anzeige von Hydranten.",
+        "name": "Karte der Hydranten",
+        "presets": {
+            "0": {
+                "description": "Ein Hydrant ist ein Anschlusspunkt, an dem die Feuerwehr Wasser zapfen kann. Er kann sich unterirdisch befinden.",
+                "title": "Löschwasser-Hydrant"
+            }
+        },
+        "tagRenderings": {
+            "hydrant-color": {
+                "mappings": {
+                    "0": {
+                        "then": "Die Farbe des Hydranten ist unbekannt."
+                    },
+                    "1": {
+                        "then": "Die Farbe des Hydranten ist gelb."
+                    },
+                    "2": {
+                        "then": "Die Farbe des Hydranten ist rot."
+                    }
+                },
+                "question": "Welche Farbe hat der Hydrant?",
+                "render": "Der Hydrant hat die Farbe {colour}"
+            },
+            "hydrant-state": {
+                "mappings": {
+                    "0": {
+                        "then": "Der Hydrant ist (ganz oder teilweise) in Betrieb"
+                    },
+                    "1": {
+                        "then": "Der Hydrant ist nicht verfügbar"
+                    },
+                    "2": {
+                        "then": "Der Hydrant wurde entfernt"
+                    }
+                },
+                "question": "Ist dieser Hydrant noch in Betrieb?"
+            },
+            "hydrant-type": {
+                "mappings": {
+                    "0": {
+                        "then": "Der Typ des Hydranten ist unbekannt."
+                    },
+                    "1": {
+                        "then": "<img style=\"width:15px\" src=\"./assets/themes/hailhydrant/hydrant_pillar.svg\" /> Säulenart."
+                    },
+                    "2": {
+                        "then": "<img style=\"width:15px\" src=\"./assets/themes/hailhydrant/hydrant_unknown.svg\" /> Rohrtyp."
+                    },
+                    "3": {
+                        "then": "<img style=\"width:15px\" src=\"./assets/themes/hailhydrant/hydrant_unknown.svg\" /> Wandtyp."
+                    },
+                    "4": {
+                        "then": "<img style=\"width:15px\" src=\"./assets/themes/hailhydrant/hydrant_underground.svg\" /> Untergrundtyp."
+                    }
+                },
+                "question": "Um welche Art von Hydrant handelt es sich?",
+                "render": " Hydranten-Typ: {fire_hydrant:type}"
+            }
+        },
+        "title": {
+            "render": "Hydrant"
         }
     },
     "information_board": {
@@ -2507,8 +2907,7 @@
         "name": "Toiletten",
         "presets": {
             "0": {
-                "description": "Eine öffentlich zugängliche Toilette",
-                "title": "toilette"
+                "title": "öffentlich zugängliche Toilette"
             },
             "1": {
                 "description": "Eine Toilettenanlage mit mindestens einer rollstuhlgerechten Toilette",

@@ -543,7 +543,8 @@
       "condition": "cuisine=friture"
     },
     "service:electricity",
-    "dog-access"
+    "dog-access",
+    "reviews"
   ],
   "filter": [
     {
@@ -675,5 +676,8 @@
         "centroid"
       ]
     }
-  ]
+  ],
+  "description": {
+    "en": "A layer showing restaurants and fast-food amenities (with a special rendering for friteries)"
+  }
 }

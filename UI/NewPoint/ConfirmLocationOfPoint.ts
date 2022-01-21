@@ -12,6 +12,7 @@ import Translations from "../i18n/Translations";
 import Svg from "../../Svg";
 import Toggle from "../Input/Toggle";
 import SimpleAddUI, {PresetInfo} from "../BigComponents/SimpleAddUI";
+import BaseLayer from "../../Models/BaseLayer";
 
 export default class ConfirmLocationOfPoint extends Combine {
 
@@ -19,7 +20,8 @@ export default class ConfirmLocationOfPoint extends Combine {
     constructor(
         state: {
             osmConnection: OsmConnection,
-            featurePipeline: FeaturePipeline
+            featurePipeline: FeaturePipeline,
+            backgroundLayer?: UIEventSource<BaseLayer>
         },
         filterViewIsOpened: UIEventSource<boolean>,
         preset: PresetInfo,
@@ -27,6 +29,7 @@ export default class ConfirmLocationOfPoint extends Combine {
         loc: { lon: number, lat: number },
         confirm: (tags: any[], location: { lat: number, lon: number }, snapOntoWayId: string) => void,
         cancel: () => void,
+        closePopup: () => void
     ) {
 
         let preciseInput: LocationInput = undefined
@@ -35,9 +38,11 @@ export default class ConfirmLocationOfPoint extends Combine {
             const zloc = {...loc, zoom: 19}
             const locationSrc = new UIEventSource(zloc);
 
-            let backgroundLayer = undefined;
+            let backgroundLayer = new UIEventSource(state?.backgroundLayer?.data ?? AvailableBaseLayers.osmCarto);
             if (preset.preciseInput.preferredBackground) {
-                backgroundLayer = AvailableBaseLayers.SelectBestLayerAccordingTo(locationSrc, new UIEventSource<string | string[]>(preset.preciseInput.preferredBackground))
+                const defaultBackground = AvailableBaseLayers.SelectBestLayerAccordingTo(locationSrc, new UIEventSource<string | string[]>(preset.preciseInput.preferredBackground));
+                // Note that we _break the link_ here, as the minimap will take care of the switching!
+                backgroundLayer.setData(defaultBackground.data)
             }
 
             let snapToFeatures: UIEventSource<{ feature: any }[]> = undefined
@@ -94,7 +99,8 @@ export default class ConfirmLocationOfPoint extends Combine {
             ]).SetClass("flex flex-col")
         ).SetClass("font-bold break-words")
             .onClick(() => {
-                confirm(preset.tags, (preciseInput?.GetValue()?.data ?? loc), preciseInput?.snappedOnto?.data?.properties?.id);
+                console.log("The confirmLocationPanel - precise input yielded ", preciseInput?.GetValue()?.data)
+                confirm(preset.tags, preciseInput?.GetValue()?.data ?? loc, preciseInput?.snappedOnto?.data?.properties?.id);
             });
 
         if (preciseInput !== undefined) {
@@ -132,33 +138,26 @@ export default class ConfirmLocationOfPoint extends Combine {
                 ]
             ).SetClass("flex flex-col")
         ).onClick(() => {
-            preset.layerToAddTo.appliedFilters.setData([])
+            
+            const appliedFilters = preset.layerToAddTo.appliedFilters;
+            appliedFilters.data.forEach((_, k) => appliedFilters.data.set(k, undefined))
+            appliedFilters.ping()
             cancel()
+            closePopup()
         })
 
+        const hasActiveFilter = preset.layerToAddTo.appliedFilters
+            .map(appliedFilters => {
+                const activeFilters = Array.from(appliedFilters.values()).filter(f => f?.currentFilter !== undefined);
+                    return activeFilters.length === 0;
+            })
+        
+        // If at least one filter is active which _might_ hide a newly added item, this blocks the preset and requests the filter to be disabled
         const disableFiltersOrConfirm = new Toggle(
             openLayerOrConfirm,
-            disableFilter,
-            preset.layerToAddTo.appliedFilters.map(filters => {
-                if (filters === undefined || filters.length === 0) {
-                    return true;
-                }
-                for (const filter of filters) {
-                    if (filter.selected === 0 && filter.filter.options.length === 1) {
-                        return false;
-                    }
-                    if (filter.selected !== undefined) {
-                        const tags = filter.filter.options[filter.selected].osmTags
-                        if (tags !== undefined && tags["and"]?.length !== 0) {
-                            // This actually doesn't filter anything at all
-                            return false;
-                        }
-                    }
-                }
-                return true
-
-            })
-        )
+            disableFilter, 
+            hasActiveFilter)
+        
 
 
         const tagInfo = SimpleAddUI.CreateTagInfoFor(preset, state.osmConnection);

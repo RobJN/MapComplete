@@ -1,5 +1,4 @@
 import {OsmNode, OsmObject, OsmRelation, OsmWay} from "./OsmObject";
-import State from "../../State";
 import {UIEventSource} from "../UIEventSource";
 import Constants from "../../Models/Constants";
 import OsmChangeAction from "./Actions/OsmChangeAction";
@@ -13,6 +12,7 @@ import {ElementStorage} from "../ElementStorage";
 import {GeoLocationPointProperties} from "../Actors/GeoLocationHandler";
 import {GeoOperations} from "../GeoOperations";
 import {ChangesetTag} from "./ChangesetHandler";
+import {OsmConnection} from "./OsmConnection";
 
 /**
  * Handles all changes made to OSM.
@@ -32,15 +32,24 @@ export class Changes {
 
     private readonly previouslyCreated: OsmObject[] = []
     private readonly _leftRightSensitive: boolean;
-    
-    private _state : { allElements: ElementStorage; historicalUserLocations: FeatureSource }
 
-    constructor(leftRightSensitive: boolean = false) {
+    public readonly state: { allElements: ElementStorage; historicalUserLocations: FeatureSource; osmConnection: OsmConnection }
+    
+    public readonly extraComment:UIEventSource<string> = new UIEventSource(undefined)
+
+    constructor(
+        state?: {
+            allElements: ElementStorage,
+            historicalUserLocations: FeatureSource,
+            osmConnection: OsmConnection
+        },
+        leftRightSensitive: boolean = false) {
         this._leftRightSensitive = leftRightSensitive;
         // We keep track of all changes just as well
         this.allChanges.setData([...this.pendingChanges.data])
         // If a pending change contains a negative ID, we save that
         this._nextId = Math.min(-1, ...this.pendingChanges.data?.map(pch => pch.id) ?? [])
+        this.state = state;
 
         // Note: a changeset might be reused which was opened just before and might have already used some ids
         // This doesn't matter however, as the '-1' is per piecewise upload, not global per changeset
@@ -98,7 +107,7 @@ export class Changes {
      * Uploads all the pending changes in one go.
      * Triggered by the 'PendingChangeUploader'-actor in Actors
      */
-    public flushChanges(flushreason: string = undefined) {
+    public async flushChanges(flushreason: string = undefined, openChangeset?: UIEventSource<number>) : Promise<void>{
         if (this.pendingChanges.data.length === 0) {
             return;
         }
@@ -106,32 +115,32 @@ export class Changes {
             console.log("Is already uploading... Abort")
             return;
         }
+
+        
         console.log("Uploading changes due to: ", flushreason)
         this.isUploading.setData(true)
-
-        this.flushChangesAsync()
-            .then(_ => {
-                this.isUploading.setData(false)
-                console.log("Changes flushed!");
-            })
-            .catch(e => {
-                this.isUploading.setData(false)
-                console.error("Flushing changes failed due to", e);
-            })
+        try {
+            const csNumber = await this.flushChangesAsync(openChangeset)
+            this.isUploading.setData(false)
+            console.log("Changes flushed. Your changeset is "+csNumber);
+        } catch (e) {
+            this.isUploading.setData(false)
+            console.error("Flushing changes failed due to", e);
+        }
     }
 
-    private calculateDistanceToChanges(change: OsmChangeAction, changeDescriptions: ChangeDescription[]){
+    private calculateDistanceToChanges(change: OsmChangeAction, changeDescriptions: ChangeDescription[]) {
 
-        if (this._state === undefined) {
+        if (this.state === undefined) {
             // No state loaded -> we can't calculate...
             return;
         }
-        if(!change.trackStatistics){
+        if (!change.trackStatistics) {
             // Probably irrelevant, such as a new helper node
             return;
         }
         const now = new Date()
-        const recentLocationPoints = this._state.historicalUserLocations.features.data.map(ff => ff.feature)
+        const recentLocationPoints = this.state.historicalUserLocations.features.data.map(ff => ff.feature)
             .filter(feat => feat.geometry.type === "Point")
             .filter(feat => {
                 const visitTime = new Date((<GeoLocationPointProperties>feat.properties).date)
@@ -139,34 +148,34 @@ export class Changes {
                 const diff = (now.getTime() - visitTime.getTime()) / 1000
                 return diff < Constants.nearbyVisitTime;
             })
-        if(recentLocationPoints.length === 0){
+        if (recentLocationPoints.length === 0) {
             // Probably no GPS enabled/no fix 
             return;
         }
-        
+
         // The applicable points, contain information in their properties about location, time and GPS accuracy
         // They are all GeoLocationPointProperties
         // We walk every change and determine the closest distance possible
         // Only if the change itself does _not_ contain any coordinates, we fall back and search the original feature in the state
-        
-        const changedObjectCoordinates : [number, number][] = []
-        
-        const feature = this._state.allElements.ContainingFeatures.get(change.mainObjectId)
-        if(feature !== undefined){
-        changedObjectCoordinates.push(GeoOperations.centerpointCoordinates(feature))
+
+        const changedObjectCoordinates: [number, number][] = []
+
+        const feature = this.state.allElements.ContainingFeatures.get(change.mainObjectId)
+        if (feature !== undefined) {
+            changedObjectCoordinates.push(GeoOperations.centerpointCoordinates(feature))
         }
 
         for (const changeDescription of changeDescriptions) {
-            const chng : {lat: number, lon: number} | {coordinates : [number,number][]} | {members} = changeDescription.changes
-            if(chng === undefined){
+            const chng: { lat: number, lon: number } | { coordinates: [number, number][] } | { members } = changeDescription.changes
+            if (chng === undefined) {
                 continue
             }
-           if(chng["lat"] !== undefined){
-               changedObjectCoordinates.push([chng["lat"],chng["lon"]])
-           }
-           if(chng["coordinates"] !== undefined){
-               changedObjectCoordinates.push(...chng["coordinates"])
-           }
+            if (chng["lat"] !== undefined) {
+                changedObjectCoordinates.push([chng["lat"], chng["lon"]])
+            }
+            if (chng["coordinates"] !== undefined) {
+                changedObjectCoordinates.push(...chng["coordinates"])
+            }
         }
 
         return Math.min(...changedObjectCoordinates.map(coor =>
@@ -176,7 +185,7 @@ export class Changes {
             }))
         ))
     }
-    
+
     public async applyAction(action: OsmChangeAction): Promise<void> {
         const changeDescriptions = await action.Perform(this)
         changeDescriptions[0].meta.distanceToObject = this.calculateDistanceToChanges(action, changeDescriptions)
@@ -190,13 +199,7 @@ export class Changes {
         this.allChanges.data.push(...changes)
         this.allChanges.ping()
     }
-    
-    public useLocationHistory(state: {
-        allElements: ElementStorage,
-        historicalUserLocations: FeatureSource
-    }){
-        this._state= state
-    }
+
 
     public registerIdRewrites(mappings: Map<string, string>): void {
         CreateNewNodeAction.registerIdRewrites(mappings)
@@ -206,13 +209,17 @@ export class Changes {
     /**
      * UPload the selected changes to OSM.
      * Returns 'true' if successfull and if they can be removed
-     * @param pending
-     * @private
      */
-    private async flushSelectChanges(pending: ChangeDescription[]): Promise<boolean> {
+    private async flushSelectChanges(pending: ChangeDescription[], openChangeset: UIEventSource<number>): Promise<boolean> {
         const self = this;
         const neededIds = Changes.GetNeededIds(pending)
-        const osmObjects = await Promise.all(neededIds.map(id => OsmObject.DownloadObjectAsync(id)));
+
+        const osmObjects = Utils.NoNull(await Promise.all(neededIds.map(async id =>
+            OsmObject.DownloadObjectAsync(id).catch(e => {
+                console.error("Could not download OSM-object", id, " dropping it from the changes")
+                pending = pending.filter(ch => ch.type + "/" + ch.id !== id)
+                return undefined;
+            }))));
 
         if (this._leftRightSensitive) {
             osmObjects.forEach(obj => SimpleMetaTagger.removeBothTagging(obj.tags))
@@ -243,43 +250,48 @@ export class Changes {
                 key: descr.meta.changeType + ":" + descr.type + "/" + descr.id,
                 value: descr.meta.specialMotivation
             }))
-        
+
         const distances = Utils.NoNull(pending.map(descr => descr.meta.distanceToObject));
         distances.sort((a, b) => a - b)
         const perBinCount = Constants.distanceToChangeObjectBins.map(_ => 0)
 
         let j = 0;
         const maxDistances = Constants.distanceToChangeObjectBins
-        for (let i = 0; i < maxDistances.length; i++){
+        for (let i = 0; i < maxDistances.length; i++) {
             const maxDistance = maxDistances[i];
             // distances is sorted in ascending order, so as soon as one is to big, all the resting elements will be bigger too
-            while(j < distances.length && distances[j] < maxDistance){
-                perBinCount[i] ++
+            while (j < distances.length && distances[j] < maxDistance) {
+                perBinCount[i]++
                 j++
             }
         }
 
         const perBinMessage = Utils.NoNull(perBinCount.map((count, i) => {
-            if(count === 0){
+            if (count === 0) {
                 return undefined
             }
-            const maxD =maxDistances[i]
+            const maxD = maxDistances[i]
             let key = `change_within_${maxD}m`
-            if(maxD === Number.MAX_VALUE){
+            if (maxD === Number.MAX_VALUE) {
                 key = `change_over_${maxDistances[i - 1]}m`
             }
             return {
-                key ,
+                key,
                 value: count,
-                aggregate:true
+                aggregate: true
             }
         }))
-        
+
         // This method is only called with changedescriptions for this theme
         const theme = pending[0].meta.theme
-        const metatags : ChangesetTag[] = [{
+        let comment = "Adding data with #MapComplete for theme #" + theme
+        if(this.extraComment.data !== undefined){
+            comment+="\n\n"+this.extraComment.data
+        }
+        
+        const metatags: ChangesetTag[] = [{
             key: "comment",
-            value: "Adding data with #MapComplete for theme #" + theme
+            value: comment
         },
             {
                 key: "theme",
@@ -290,16 +302,17 @@ export class Changes {
             ...perBinMessage
         ]
 
-        await State.state.osmConnection.changesetHandler.UploadChangeset(
+        await this.state.osmConnection.changesetHandler.UploadChangeset(
             (csId) => Changes.createChangesetFor("" + csId, changes),
-            metatags
+            metatags,
+            openChangeset
         )
 
         console.log("Upload successfull!")
         return true;
     }
 
-    private async flushChangesAsync(): Promise<void> {
+    private async flushChangesAsync(openChangeset?: UIEventSource<number>): Promise<void> {
         const self = this;
         try {
             // At last, we build the changeset and upload
@@ -314,10 +327,23 @@ export class Changes {
                 pendingPerTheme.get(theme).push(changeDescription)
             }
 
-            const successes = await Promise.all(Array.from(pendingPerTheme, ([_, value]) => value)
-                .map(async pendingChanges => {
+            const successes = await Promise.all(Array.from(pendingPerTheme, 
+               async ([theme, pendingChanges]) => {
                     try {
-                        return await self.flushSelectChanges(pendingChanges);
+                        if(openChangeset === undefined){
+                            openChangeset = this.state.osmConnection.GetPreference("current-open-changeset-" + theme).map(
+                                str => {
+                                    const n = Number(str);
+                                    if (isNaN(n)) {
+                                        return undefined
+                                    }
+                                    return n
+                                }, [], n => "" + n
+                            );
+                            console.log("Using current-open-changeset-"+theme+" from the preferences, got "+openChangeset.data)
+                        }
+                        
+                        return await self.flushSelectChanges(pendingChanges, openChangeset);
                     } catch (e) {
                         console.error("Could not upload some changes:", e)
                         return false
@@ -358,12 +384,18 @@ export class Changes {
             states.set(o.type + "/" + o.id, "unchanged")
         }
 
-        let changed = false;
         for (const change of changes) {
+            let changed = false;
             const id = change.type + "/" + change.id
             if (!objects.has(id)) {
+                // The object hasn't been seen before, so it doesn't exist yet and is newly created by its very definition
                 if (change.id >= 0) {
+                    // Might be a failed fetch for simply this object
                     throw "Did not get an object that should be known: " + id
+                }
+                if(change.changes === undefined){
+                    // This object is a change to a newly created object. However, we have not seen the creation changedescription yet!
+                    throw "Not a creation of the object"
                 }
                 // This is a new object that should be created
                 states.set(id, "created")
@@ -461,7 +493,7 @@ export class Changes {
 
             }
 
-            if (changed && state === "unchanged") {
+            if (changed && states.get(id) === "unchanged") {
                 states.set(id, "modified")
             }
         }
@@ -488,6 +520,7 @@ export class Changes {
 
         })
 
+        console.debug("Calculated the pending changes: ", result.newObjects.length,"new; ", result.modifiedObjects.length,"modified;",result.deletedObjects,"deleted")
         return result
     }
 }

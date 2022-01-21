@@ -82,6 +82,15 @@ export interface LayerConfigJson {
      *  "_max_overlap_ratio=Number(feat._max_overlap_m2)/feat.area
      * ]
      *
+     * The specified tags are evaluated lazily. E.g. if a calculated tag is only used in the popup (e.g. the number of nearby features),
+     * the expensive calculation will only be performed then for that feature. This avoids clogging up the contributors PC when all features are loaded.
+     * 
+     * If a tag has to be evaluated strictly, use ':=' instead:
+     * 
+     * [
+     * "_some_key:=some_javascript_expression"
+     * ]
+     * 
      */
     calculatedTags?: string[];
 
@@ -109,6 +118,13 @@ export interface LayerConfigJson {
      */
     minzoom?: number;
 
+
+    /**
+     * Indicates if this layer is shown by default;
+     * can be used to hide a layer from start, or to load the layer but only to show it where appropriate (e.g. for snapping to it)
+     */
+    shownByDefault?: true | boolean;
+    
     /**
      * The zoom level at which point the data is hidden again
      * Default: 100 (thus: always visible
@@ -124,12 +140,12 @@ export interface LayerConfigJson {
      * Small icons shown next to the title.
      * If not specified, the OsmLink and wikipedia links will be used by default.
      * Use an empty array to hide them.
-     * Note that "defaults" will insert all the default titleIcons
+     * Note that "defaults" will insert all the default titleIcons (which are added automatically)
      */
-    titleIcons?: (string | TagRenderingConfigJson)[];
+    titleIcons?: (string | TagRenderingConfigJson)[] | ["defaults"];
 
 
-    mapRendering: (PointRenderingConfigJson | LineRenderingConfigJson)[]
+    mapRendering: null | (PointRenderingConfigJson | LineRenderingConfigJson)[]
 
     /**
      * If set, this layer will pass all the features it receives onto the next layer.

@@ -22,6 +22,7 @@ import {Changes} from "../../Logic/Osm/Changes";
 import FeaturePipeline from "../../Logic/FeatureSource/FeaturePipeline";
 import {ElementStorage} from "../../Logic/ElementStorage";
 import ConfirmLocationOfPoint from "../NewPoint/ConfirmLocationOfPoint";
+import BaseLayer from "../../Models/BaseLayer";
 
 /*
 * The SimpleAddUI is a single panel, which can have multiple states:
@@ -52,6 +53,7 @@ export default class SimpleAddUI extends Toggle {
                     locationControl: UIEventSource<Loc>,
                     filteredLayers: UIEventSource<FilteredLayer[]>,
                     featureSwitchFilter: UIEventSource<boolean>,
+                    backgroundLayer: UIEventSource<BaseLayer>
                 }) {
         const loginButton = new SubtleButton(Svg.osm_logo_ui(), Translations.t.general.add.pleaseLogin.Clone())
             .onClick(() => state.osmConnection.AttemptLogin());
@@ -89,8 +91,7 @@ export default class SimpleAddUI extends Toggle {
                         return presetsOverview
                     }
 
-
-                    function confirm(tags, location, snapOntoWayId?: string) {
+                    function confirm(tags:any[], location: {lat: number, lon:number}, snapOntoWayId?: string) {
                         if (snapOntoWayId === undefined) {
                             createNewPoint(tags, location, undefined)
                         } else {
@@ -110,7 +111,10 @@ export default class SimpleAddUI extends Toggle {
                         message,
                         state.LastClickLocation.data,
                         confirm,
-                        cancel)
+                        cancel,
+                        () => {
+                            isShown.setData(false)
+                        })
                 }
             ))
 
@@ -134,9 +138,6 @@ export default class SimpleAddUI extends Toggle {
             loginButton,
             state.osmConnection.isLoggedIn
         )
-
-
-        this.SetStyle("font-size:large");
     }
 
 

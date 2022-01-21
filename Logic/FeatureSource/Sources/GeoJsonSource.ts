@@ -83,7 +83,7 @@ export default class GeoJsonSource implements FeatureSourceForLayer, Tiled {
                 if (self.layer.layerDef.source.mercatorCrs) {
                     json = GeoOperations.GeoJsonToWGS84(json)
                 }
-
+                
                 const time = new Date();
                 const newFeatures: { feature: any, freshness: Date } [] = []
                 let i = 0;
@@ -93,7 +93,7 @@ export default class GeoJsonSource implements FeatureSourceForLayer, Tiled {
                     for (const key in props) {
                         if (typeof props[key] !== "string") {
                             // Make sure all the values are string, it crashes stuff otherwise
-                            props[key] = "" + props[key]
+                            props[key] = JSON.stringify(props[key])
                         }
                     }
 
@@ -126,7 +126,7 @@ export default class GeoJsonSource implements FeatureSourceForLayer, Tiled {
 
                 eventSource.setData(eventSource.data.concat(newFeatures))
 
-            }).catch(msg => console.error("Could not load geojon layer", url, "due to", msg))
+            }).catch(msg => console.debug("Could not load geojson layer", url, "due to", msg))
     }
 
 }

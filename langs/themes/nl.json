@@ -212,14 +212,30 @@
                             },
                             "1": {
                                 "then": "Er is internettoegang"
+                            },
+                            "2": {
+                                "then": "Er is geen internettoegang"
                             }
-                        }
+                        },
+                        "question": "Biedt deze plaats internettoegang?"
                     },
                     "caravansites-name": {
                         "question": "Wat is de naam van deze plaats?",
                         "render": "Deze plaats heet {name}"
                     },
+                    "caravansites-toilets": {
+                        "mappings": {
+                            "0": {
+                                "then": "Deze plaats heeft toiletten"
+                            },
+                            "1": {
+                                "then": "Deze plaats heeft geen toiletten"
+                            }
+                        },
+                        "question": "Heeft deze plaats toiletten?"
+                    },
                     "caravansites-website": {
+                        "question": "Heeft deze plaats een website?",
                         "render": "Officiële website: : <a href='{website}'>{website}</a>"
                     }
                 },
@@ -751,11 +767,9 @@
         "title": "Witte Fietsen"
     },
     "grb": {
-        "description": "GRB Fixup",
+        "description": "Dit thema helpt het GRB importeren.",
         "layers": {
-            "3": {
-                "description": "Dit gebouw heeft een foutmelding",
-                "name": "Fixmes op gebouwen",
+            "1": {
                 "tagRenderings": {
                     "grb-fixme": {
                         "mappings": {
@@ -786,19 +800,16 @@
                     "grb-unit": {
                         "render": "De wooneenheid-aanduiding is <b>{addr:unit}</b> "
                     }
-                },
-                "title": {
-                    "mappings": {
-                        "0": {
-                            "then": "{fixme}"
-                        }
-                    },
-                    "render": "{addr:street} {addr:housenumber}"
                 }
-            },
-            "5": {
-                "description": "Dit gebouw heeft een foutmelding",
-                "name": "Fixmes op gebouwen",
+            }
+        },
+        "shortDescription": "Grb import helper tool",
+        "title": "GRB import helper"
+    },
+    "grb_fixme": {
+        "description": "Gebouwen met een FIXME - wss GRB-import die gefixed moeten worden",
+        "layers": {
+            "0": {
                 "tagRenderings": {
                     "grb-fixme": {
                         "mappings": {
@@ -829,14 +840,6 @@
                     "grb-unit": {
                         "render": "De wooneenheid-aanduiding is <b>{addr:unit}</b> "
                     }
-                },
-                "title": {
-                    "mappings": {
-                        "0": {
-                            "then": "{fixme}"
-                        }
-                    },
-                    "render": "{addr:street} {addr:housenumber}"
                 }
             }
         },
@@ -847,6 +850,11 @@
         "description": "Op deze kaart kan je alle kaarten zien die OpenStreetMap kent.<br/><br/>Ontbreekt er een kaart, dan kan je die kaart hier ook gemakelijk aan deze kaart toevoegen.",
         "shortDescription": "Een kaart met alle kaarten die OpenStreetMap kent",
         "title": "Een kaart met Kaarten"
+    },
+    "missing_streets": {
+        "description": "Dit thema voegt automatisch straatnamen toe aan gebouwen met huisnummer en overeenkomstig CRAB-adres.",
+        "shortDescription": "Voegt ontbrekende straten toe aan gebouwen met huisnumer adhv CRAB",
+        "title": "Fix ontbrekende straten"
     },
     "nature": {
         "description": "Op deze kaart vind je informatie voor natuurliefhebbers, zoals info over het natuurgebied waar je inzit, vogelkijkhutten, informatieborden, ...",
@@ -1034,10 +1042,10 @@
         "title": "Surveillance under Surveillance"
     },
     "toerisme_vlaanderen": {
-        "description": "Op deze kaart kan je info zien die relevant is voor toerisme, zoals:<br/><ul><li>Eetgelegenheden</li><li>Cafés en bars</li><li>(Fiets)oplaadpunten</li><li>Fietspompen, fietserverhuur en fietswinkels</li><li>Uitkijktorens</li><li>...</li></ul> Zie je fouten op de kaart? Dan kan je zelf makkelijk aanpasingen maken, die zichtbaar zijn voor iedereen. Hiervoor dien je een gratis OpenStreetMap account voor te maken.",
-        "descriptionTail": "Met de steun van Toerisme Vlaanderen<img style='height:5rem; width: auto;' src='./assets/themes/toerisme_vlaanderen/logo.png' />",
+        "description": "<p class='mb-4'><i>Pin je punt</i> is een open toerismekaart waarin wandelaars en fietsers nuttige gegevens verzamelen die handig zijn voor andere wandelaars en fietsers.</p><p class='mb-4'>We verzamelen 7 thematische lagen:  <ol><li>Laadpunten voor e-bikes</li><li>Openbare toiletten</li><li>Zit- en picknickbankjes</li><li>Uitkijkpunten, uitkijkplatformen en uitkijktorens</li><li>Fietsherstelpunten</li><li>Fietsverhuurpunten</li><li>Speeltuinen</li></ol><p>Klik op de exacte locatie op de kaart om een van deze 7 punten toe te voegen. Of corrigeer bestaande punten door erop te klikken.</p>",
+        "descriptionTail": "<p>Met de steun van Toerisme Vlaanderen</p><a href='https://www.toerismevlaanderen.be/pinjepunt'>Meer informatie op toerismevlaaneren.be</a><img style='height:5rem; width: auto;' src='./assets/themes/toerisme_vlaanderen/logo.png' />",
         "shortDescription": "Een kaart om toeristisch relevante info op aan te duiden",
-        "title": "Toeristisch relevante info"
+        "title": "Pin je punt"
     },
     "toilets": {
         "description": "Een kaart met openbare toiletten",
@@ -1053,6 +1061,7 @@
         "layers": {
             "2": {
                 "description": "Adressen",
+                "name": "Bekende adressen in OSM",
                 "tagRenderings": {
                     "uk_addresses_housenumber": {
                         "mappings": {
@@ -1062,6 +1071,9 @@
                         },
                         "render": "Het huisnummer is <b>{addr:housenumber}</b>"
                     }
+                },
+                "title": {
+                    "render": "Bekend adres"
                 }
             }
         }

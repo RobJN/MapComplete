@@ -1,4 +1,26 @@
 {
+    "address": {
+        "description": "Adressen",
+        "name": "Bekende adressen in OSM",
+        "tagRenderings": {
+            "housenumber": {
+                "mappings": {
+                    "0": {
+                        "then": "Dit gebouw heeft geen huisnummer"
+                    }
+                },
+                "question": "Wat is het huisnummer van dit huis?",
+                "render": "Het huisnummer is <b>{addr:housenumber}</b>"
+            },
+            "street": {
+                "question": "In welke straat bevindt dit adres zich?",
+                "render": "Dit adres bevindt zich in de straat <b>{addr:street}</b>"
+            }
+        },
+        "title": {
+            "render": "Bekend adres"
+        }
+    },
     "artwork": {
         "description": "Verschillende soorten kunstwerken",
         "name": "Kunstwerken",
@@ -138,6 +160,16 @@
                 "question": "Hoe breed is de smalste opening naast de barrières?",
                 "render": "Breedte van de opening: {width:opening} m"
             },
+            "barrier_type": {
+                "mappings": {
+                    "0": {
+                        "then": "Dit is een enkel paaltje in de weg"
+                    },
+                    "1": {
+                        "then": "Dit zijn fietshekjes die fietsers afremmen"
+                    }
+                }
+            },
             "bicycle=yes/no": {
                 "mappings": {
                     "0": {
@@ -163,6 +195,7 @@
         }
     },
     "bench": {
+        "description": "Deze laag toont zitbanken en enkele vragen over deze zitbanken",
         "name": "Zitbanken",
         "presets": {
             "0": {
@@ -257,8 +290,14 @@
         "tagRenderings": {
             "bench_at_pt-bench_type": {
                 "mappings": {
+                    "0": {
+                        "then": "Er is hier een normale zitbank"
+                    },
                     "1": {
                         "then": "Leunbank"
+                    },
+                    "2": {
+                        "then": "Er is hier geen bank"
                     }
                 },
                 "question": "Wat voor soort bank is dit?"
@@ -547,6 +586,7 @@
         }
     },
     "bike_repair_station": {
+        "description": "Deze laag toont fietspompen en herstelpunten voor fietsen",
         "name": "Fietspunten (herstel, pomp of allebei)",
         "presets": {
             "0": {
@@ -563,7 +603,7 @@
         },
         "tagRenderings": {
             "Email maintainer": {
-                "render": "<a href='mailto:{email}?subject=Kapotte fietspomp&body=Geachte,%0D%0A%0D%0AGraag had ik u gemeld dat een fietspomp defect is. De fietspomp bevindt zich hier: https://mapcomplete.osm.be/cyclofix#{id}.'>Rapporteer deze fietspomp als kapot</a>"
+                "render": "<a href='mailto:{email}?subject=Kapotte fietspomp&body=Geachte,%0D%0A%0D%0AGraag had ik u gemeld dat een fietspomp defect is. De fietspomp bevindt zich hier: https://mapcomplete.osm.be/cyclofix?lat={_lat}%26lon={_lon}%26z=18%23{id}.%0D%0A%0D%0AMet vriendelijke groeten.'>Rapporteer deze fietspomp als kapot</a>"
             },
             "Operational status": {
                 "mappings": {
@@ -1126,13 +1166,7 @@
                 "title": "laadpunt met gewone stekker(s) <img src='./assets/layers/charging_station/TypeE.svg' style='width: 2rem; height: 2rem; float: left; background: white; border-radius: 1rem; margin-right: 0.5rem'/> (bedoeld om electrische fietsen op te laden)"
             },
             "1": {
-                "title": "oplaadpunt voor elektrische fietsen"
-            },
-            "2": {
                 "title": "oplaadstation voor elektrische auto's"
-            },
-            "3": {
-                "title": "oplaadstation"
             }
         },
         "tagRenderings": {
@@ -2048,6 +2082,13 @@
             }
         }
     },
+    "crab_address": {
+        "tagRenderings": {
+            "render_crab": {
+                "render": "Volgens het CRAB ligt hier <b>{STRAATNM}</b> {HUISNR} (label: {HNRLABEL})"
+            }
+        }
+    },
     "crossings": {
         "description": "Oversteekplaatsen voor voetgangers en fietsers",
         "name": "Oversteekplaatsen",
@@ -2158,6 +2199,9 @@
                     },
                     "2": {
                         "then": "Zebrapad"
+                    },
+                    "3": {
+                        "then": "Oversteekplaats zonder kruispuntmarkeringen"
                     }
                 },
                 "question": "Wat voor oversteekplaats is dit?"
@@ -2536,6 +2580,9 @@
         "presets": {
             "0": {
                 "title": "Defibrillator"
+            },
+            "1": {
+                "title": "defibrillator die aan een muur hangt"
             }
         },
         "tagRenderings": {
@@ -2657,6 +2704,7 @@
         "name": "Richtingsvisualisatie"
     },
     "drinking_water": {
+        "description": "Deze laag toont drinkwaterpunten",
         "name": "Drinkbaar water",
         "presets": {
             "0": {
@@ -2696,6 +2744,26 @@
         },
         "title": {
             "render": "Drinkbaar water"
+        }
+    },
+    "entrance": {
+        "tagRenderings": {
+            "Door_type": {
+                "mappings": {
+                    "1": {
+                        "then": "Een gewone deur die aan scharnieren ophangt en openzwaait"
+                    },
+                    "2": {
+                        "then": "Een tourniquet-deur (draaideur) die in een cylinder rond een centrale as draait"
+                    },
+                    "3": {
+                        "then": "Een schuifdeur or roldeur die bij het openen en sluiten zijwaarts beweegt"
+                    },
+                    "4": {
+                        "then": "Een poort die langs boven dichtrolt, typisch voor garages"
+                    }
+                }
+            }
         }
     },
     "etymology": {
@@ -3028,6 +3096,7 @@
         }
     },
     "information_board": {
+        "description": "Deze laag toont informatieborden in de publieke ruimte die uitleg geven over een bezienswaardigheid (bv. uitleg over het landschap, een ruine, een kaart van de omgeving, ...)",
         "name": "Informatieborden",
         "presets": {
             "0": {
@@ -4063,6 +4132,7 @@
         }
     },
     "toilet": {
+        "description": "Een laag die publieke toiletten toont",
         "filter": {
             "0": {
                 "options": {
@@ -4096,12 +4166,11 @@
         "name": "Toiletten",
         "presets": {
             "0": {
-                "description": "Een publieke toilet",
-                "title": "toilet"
+                "title": "publieke toilet"
             },
             "1": {
                 "description": "Deze toiletten hebben op zijn minst één rolstoeltoegankelijke WC",
-                "title": "een rolstoeltoegankelijke toilet"
+                "title": "rolstoeltoegankelijke, publieke toilet"
             }
         },
         "tagRenderings": {

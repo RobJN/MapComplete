@@ -10,8 +10,6 @@ import {LocalStorageSource} from "../Web/LocalStorageSource";
 import {Utils} from "../../Utils";
 import ChangeToElementsActor from "../Actors/ChangeToElementsActor";
 import PendingChangesUploader from "../Actors/PendingChangesUploader";
-import TitleHandler from "../Actors/TitleHandler";
-import FeatureSource from "../FeatureSource/FeatureSource";
 
 /**
  * The part of the state keeping track of where the elements, loading them, configuring the feature pipeline etc
@@ -50,7 +48,8 @@ export default class ElementsState extends FeatureSwitchState {
     constructor(layoutToUse: LayoutConfig) {
         super(layoutToUse);
 
-        this.changes = new Changes(layoutToUse?.isLeftRightSensitive() ?? false)
+        // @ts-ignore
+        this.changes = new Changes(this,layoutToUse?.isLeftRightSensitive() ?? false)
         {
             // -- Location control initialization
             const zoom = UIEventSource.asFloat(
@@ -90,7 +89,6 @@ export default class ElementsState extends FeatureSwitchState {
 
         new ChangeToElementsActor(this.changes, this.allElements)
         new PendingChangesUploader(this.changes, this.selectedElement);
-        new TitleHandler(this);
 
     }
 }

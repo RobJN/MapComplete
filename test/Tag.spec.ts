@@ -10,13 +10,10 @@ import {And} from "../Logic/Tags/And";
 import {TagUtils} from "../Logic/Tags/TagUtils";
 import TagRenderingConfig from "../Models/ThemeConfig/TagRenderingConfig";
 
-
-Utils.runningFromConsole = true;
-
 export default class TagSpec extends T {
 
     constructor() {
-        super("tag", [
+        super( [
             ["Tag replacement works in translation", () => {
                 const tr = new Translation({
                     "en": "Test {key} abc"
@@ -519,7 +516,14 @@ export default class TagSpec extends T {
                     const filter = TagUtils.Tag("_key~*")
                     T.isTrue(filter.matchesProperties(properties), "Lazy value not matched")
                 }
-            ]]);
+            ],
+        ["test date comparison",() => {
+            
+            const filter = TagUtils.Tag("date_created<2022-01-07")
+            T.isFalse(filter.matchesProperties({"date_created":"2022-01-08"}), "Date comparison: expected a match")
+            T.isTrue(filter.matchesProperties({"date_created":"2022-01-01"}), "Date comparison: didn't expect a match")
+
+        }]]);
     }
 
 }

@@ -44,25 +44,29 @@ export default class ScrollableFullScreen extends UIElement {
         const self = this;
         isShown.addCallback(isShown => {
             if (isShown) {
-                self.Activate();
+                // We first must set the hash, then activate the panel
+                // If the order is wrong, this will cause the panel to disactivate again
                 Hash.hash.setData(hashToShow)
+                self.Activate();
             } else {
-                self.clear();
+                // Some cleanup...
+                ScrollableFullScreen.empty.AttachTo("fullscreen")
+                const fs = document.getElementById("fullscreen");
+                ScrollableFullScreen._currentlyOpen?.isShown?.setData(false);
+                fs.classList.add("hidden")
             }
         })
 
-        Hash.hash.addCallback(hash => {
-            if (!isShown.data) {
-                return;
-            }
-            if (hash === undefined || hash === "" || hash !== hashToShow) {
-                isShown.setData(false)
-            }
-        })
     }
 
     InnerRender(): BaseUIElement {
         return this._component;
+    }
+
+    Destroy() {
+        super.Destroy();
+        this._component.Destroy()
+        this._fullscreencomponent.Destroy()
     }
 
     Activate(): void {
@@ -71,13 +75,6 @@ export default class ScrollableFullScreen extends UIElement {
         const fs = document.getElementById("fullscreen");
         ScrollableFullScreen._currentlyOpen = this;
         fs.classList.remove("hidden")
-    }
-
-    private clear() {
-        ScrollableFullScreen.empty.AttachTo("fullscreen")
-        const fs = document.getElementById("fullscreen");
-        ScrollableFullScreen._currentlyOpen?.isShown?.setData(false);
-        fs.classList.add("hidden")
     }
 
     private BuildComponent(title: BaseUIElement, content: BaseUIElement, isShown: UIEventSource<boolean>) {
@@ -91,6 +88,7 @@ export default class ScrollableFullScreen extends UIElement {
 
         returnToTheMap.onClick(() => {
             isShown.setData(false)
+            Hash.hash.setData(undefined)
         })
 
         title.SetClass("block text-l sm:text-xl md:text-2xl w-full font-bold p-0 max-h-20vh overflow-y-auto")

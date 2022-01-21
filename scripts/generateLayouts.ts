@@ -1,5 +1,4 @@
-import {Utils} from "../Utils";
-import {existsSync, mkdirSync, readFileSync, writeFile, writeFileSync} from "fs";
+import {appendFileSync, existsSync, mkdirSync, readFileSync, writeFile, writeFileSync} from "fs";
 import Locale from "../UI/i18n/Locale";
 import Translations from "../UI/i18n/Translations";
 import {Translation} from "../UI/i18n/Translation";
@@ -7,11 +6,10 @@ import Constants from "../Models/Constants";
 import * as all_known_layouts from "../assets/generated/known_layers_and_themes.json"
 import {LayoutConfigJson} from "../Models/ThemeConfig/Json/LayoutConfigJson";
 import LayoutConfig from "../Models/ThemeConfig/LayoutConfig";
-// We HAVE to mark this while importing
-Utils.runningFromConsole = true;
-
 
 const sharp = require('sharp');
+const template = readFileSync("theme.html", "utf8");
+const codeTemplate = readFileSync("index_theme.ts.template", "utf8");
 
 
 function enc(str: string): string {
@@ -106,18 +104,18 @@ async function createManifest(layout: LayoutConfig) {
         background_color: "#fff",
         description: ogDescr,
         orientation: "portrait-primary, landscape-primary",
-        icons: icons
+        icons: icons,
+        categories: ["map","navigation"]
     };
 }
 
-const template = readFileSync("index.html", "utf8");
 
 async function createLandingPage(layout: LayoutConfig, manifest) {
 
     Locale.language.setData(layout.language[0]);
 
-    const ogTitle = Translations.WT(layout.title).txt;
-    const ogDescr = Translations.WT(layout.shortDescription ?? "Easily add and edit geodata with OpenStreetMap").txt;
+    const ogTitle = Translations.WT(layout.title).txt.replace(/"/g, '\\"');
+    const ogDescr = Translations.WT(layout.shortDescription ?? "Easily add and edit geodata with OpenStreetMap").txt.replace(/"/g, '\\"');
     const ogImage = layout.socialImage;
 
     let customCss = "";
@@ -132,9 +130,15 @@ async function createLandingPage(layout: LayoutConfig, manifest) {
     }
 
     const og = `
-    <meta property="og:image" content="${ogImage ?? './assets/SocialImage.png'}">
+    <meta property="og:image" content="${ogImage ?? 'assets/SocialImage.png'}">
     <meta property="og:title" content="${ogTitle}">
-    <meta property="og:description" content="${ogDescr}">`
+    <meta property="og:description" content="${ogDescr}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@mapcomplete.osm;be">
+    <meta name="twitter:creator" content="@pietervdvn">
+    <meta name="twitter:title" content="${ogTitle}">
+    <meta name="twitter:description" content="${ogDescr}">
+    <meta name="twitter:image" content="${ogImage}">`
 
     let icon = layout.icon;
     if (icon.startsWith("<?xml") || icon.startsWith("<svg")) {
@@ -156,14 +160,14 @@ async function createLandingPage(layout: LayoutConfig, manifest) {
         `<link rel="manifest" href="${enc(layout.id)}.webmanifest">`,
         og,
         customCss,
-        `<link rel="icon" href="assets/svg/add.svg" sizes="any" type="image/svg+xml">`,
         `<link rel="icon" href="${icon}" sizes="any" type="image/svg+xml">`,
         ...apple_icons
     ].join("\n")
 
     let output = template
         .replace("Loading MapComplete, hang on...", `Loading MapComplete theme <i>${ogTitle}</i>...`)
-        .replace(/<!-- THEME-SPECIFIC -->.*<!-- THEME-SPECIFIC-END-->/s, themeSpecific);
+        .replace(/<!-- THEME-SPECIFIC -->.*<!-- THEME-SPECIFIC-END-->/s, themeSpecific)
+        .replace("<script src=\"./index.ts\"></script>", `<script src='./index_${layout.id}.ts'></script>`);
 
     try {
         output = output
@@ -176,12 +180,18 @@ async function createLandingPage(layout: LayoutConfig, manifest) {
     return output;
 }
 
+async function createIndexFor(theme: LayoutConfig){
+    const filename = "index_"+theme.id+".ts"
+    writeFileSync(filename, `import * as themeConfig from "./assets/generated/themes/${theme.id}.json"\n`)
+    appendFileSync(filename, codeTemplate)
+}
+
 const generatedDir = "./assets/generated";
 if (!existsSync(generatedDir)) {
     mkdirSync(generatedDir)
 }
 
-const blacklist = ["", "test", ".", "..", "manifest", "index", "land", "preferences", "account", "openstreetmap", "custom"]
+const blacklist = ["", "test", ".", "..", "manifest", "index", "land", "preferences", "account", "openstreetmap", "custom","theme"]
 // @ts-ignore
 const all: LayoutConfigJson[] = all_known_layouts.themes;
 for (const i in all) {
@@ -206,16 +216,18 @@ for (const i in all) {
         createLandingPage(layout, manifObj).then(landing => {
             writeFile(enc(layout.id) + ".html", landing, err)
         });
+        createIndexFor(layout)
     }).catch(e => console.log("Could not generate the manifest: ", e))
 
 }
 
 createManifest(new LayoutConfig({
-    icon: "./assets/svg/mapcomplete_logo.svg",
+    icon: "assets/svg/mapcomplete_logo.svg",
     id: "index",
     language: "en",
     layers: [],
     maintainer: "Pieter Vander Vennet",
+    socialImage: "assets/SocialImage.png",
     startLat: 0,
     startLon: 0,
     startZoom: 0,
@@ -228,6 +240,4 @@ createManifest(new LayoutConfig({
 })
 
 
-console.log("Counting all translations")
-Translations.CountTranslations();
 console.log("All done!");

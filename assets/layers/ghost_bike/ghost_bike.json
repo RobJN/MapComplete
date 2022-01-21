@@ -10,7 +10,7 @@
     "es": "Bicicleta blanca",
     "fi": "Haamupyörä",
     "gl": "Bicicleta pantasma",
-    "hu": "Emlékkerékpár",
+    "hu": "Emlékkerékpárok",
     "ja": "ゴーストバイク",
     "nb_NO": "Spøkelsessykler",
     "pl": "Duch roweru",
@@ -222,5 +222,8 @@
         "centroid"
       ]
     }
-  ]
+  ],
+  "description": {
+    "en": "A layer showing memorials for cyclists, killed in road accidents"
+  }
 }

@@ -16,7 +16,7 @@ import {VariableUiElement} from "../../UI/Base/VariableUIElement";
 export default class PointRenderingConfig extends WithContextLoader {
 
     private static readonly allowed_location_codes = new Set<string>(["point", "centroid", "start", "end"])
-    public readonly location: Set<"point" | "centroid" | "start" | "end">
+    public readonly location: Set<"point" | "centroid" | "start" | "end" | string>
 
     public readonly icon: TagRenderingConfig;
     public readonly iconBadges: { if: TagsFilter; then: TagRenderingConfig }[];
@@ -47,7 +47,7 @@ export default class PointRenderingConfig extends WithContextLoader {
         if (this.location.size == 0) {
             throw "A pointRendering should have at least one 'location' to defined where it should be rendered. (At " + context + ".location)"
         }
-        this.icon = this.tr("icon", "");
+        this.icon = this.tr("icon", undefined);
         this.iconBadges = (json.iconBadges ?? []).map((overlay, i) => {
             let tr: TagRenderingConfig;
             if (typeof overlay.then === "string" &&
@@ -65,11 +65,11 @@ export default class PointRenderingConfig extends WithContextLoader {
             };
         });
 
-        const iconPath = this.icon.GetRenderValue({id: "node/-1"}).txt;
-        if (iconPath.startsWith(Utils.assets_path)) {
+        const iconPath = this.icon?.GetRenderValue({id: "node/-1"})?.txt;
+        if (iconPath !== undefined && iconPath.startsWith(Utils.assets_path)) {
             const iconKey = iconPath.substr(Utils.assets_path.length);
             if (Svg.All[iconKey] === undefined) {
-                throw "Builtin SVG asset not found: " + iconPath;
+                throw context+": builtin SVG asset not found: " + iconPath;
             }
         }
         this.iconSize = this.tr("iconSize", "40,40,center");
@@ -89,7 +89,7 @@ export default class PointRenderingConfig extends WithContextLoader {
         if (match !== null && Svg.All[match[1] + ".svg"] !== undefined) {
             const svg = (Svg.All[match[1] + ".svg"] as string)
             const targetColor = match[2]
-            const img = new Img(svg.replace(/#000000/g, targetColor), true)
+            const img = new Img(svg.replace(/rgb\(0%,0%,0%\)/g, targetColor), true)
                 .SetStyle(style)
             if (isBadge) {
                 img.SetClass("badge")
@@ -200,7 +200,8 @@ export default class PointRenderingConfig extends WithContextLoader {
         }
 
 
-        const iconAndBadges = new Combine([this.GetSimpleIcon(tags), this.GetBadges(tags)])
+        const icon = this.GetSimpleIcon(tags)
+        const iconAndBadges = new Combine([icon, this.GetBadges(tags)])
             .SetClass("block relative")
 
         if (!options?.noSize) {
@@ -208,9 +209,21 @@ export default class PointRenderingConfig extends WithContextLoader {
         } else {
             iconAndBadges.SetClass("w-full h-full")
         }
+        
+        let label = this.GetLabel(tags)
+        let htmlEl : BaseUIElement;
+        if(icon === undefined && label === undefined){
+            htmlEl = undefined
+        }else if(icon === undefined){
+            htmlEl = new Combine([label])
+        }else if(label === undefined){
+            htmlEl =  new Combine([iconAndBadges])
+        }else {
+            htmlEl = new Combine([iconAndBadges, label]).SetStyle("flex flex-col")
+        }
 
         return {
-            html: new Combine([iconAndBadges, this.GetLabel(tags)]).SetStyle("flex flex-col"),
+            html: htmlEl,
             iconSize: [iconW, iconH],
             iconAnchor: [anchorW, anchorH],
             popupAnchor: [0, 3 - anchorH],

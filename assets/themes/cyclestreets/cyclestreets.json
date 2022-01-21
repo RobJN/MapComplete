@@ -43,7 +43,7 @@
   "startZoom": 14,
   "startLon": 3.2228,
   "maintainer": "MapComplete",
-  "widenfactor": 2,
+  "widenFactor": 2,
   "clustering": {
     "maxZoom": 12,
     "minNeededElements": 200
@@ -58,7 +58,8 @@
         "zh_Hant": "單車街道",
         "it": "Strade ciclabili",
         "de": "Fahrradstraßen",
-        "nb_NO": "Sykkelgater"
+        "nb_NO": "Sykkelgater",
+        "ru": "Cyclestreets"
       },
       "minzoom": 7,
       "source": {
@@ -250,7 +251,7 @@
           "en": "Is the street <b>{name}</b> a cyclestreet?",
           "ja": "この通りはcyclestreetですか?",
           "nb_NO": "Er denne gaten en sykkelvei?",
-          "de": "Ist diese Straße eine Fahrradstraße?",
+          "de": "Ist die Straße <b>{Name}</b> eine Fahrradstraße?",
           "it": "È una strada ciclabile?"
         },
         "mappings": [

@@ -21,10 +21,55 @@ Remark that the syntax is slightly different then expected; it uses '$' to note 
 
 Note that these values can be prepare with javascript in the theme by using a [calculatedTag](calculatedTags.md#calculating-tags-with-javascript)
  `
+    public static readonly imageExtensions = new Set(["jpg","png","svg","jpeg",".gif"])
+
+    public static readonly special_visualizations_importRequirementDocs = `#### Importing a dataset into OpenStreetMap: requirements
+
+If you want to import a dataset, make sure that:
+
+1. The dataset to import has a suitable license
+2. The community has been informed of the import
+3. All other requirements of the [import guidelines](https://wiki.openstreetmap.org/wiki/Import/Guidelines) have been followed
+
+There are also some technicalities in your theme to keep in mind:
+
+1. The new feature will be added and will flow through the program as any other new point as if it came from OSM.
+    This means that there should be a layer which will match the new tags and which will display it.
+2. The original feature from your geojson layer will gain the tag '_imported=yes'.
+    This should be used to change the appearance or even to hide it (eg by changing the icon size to zero)
+3. There should be a way for the theme to detect previously imported points, even after reloading.
+    A reference number to the original dataset is an excellent way to do this
+4. When importing ways, the theme creator is also responsible of avoiding overlapping ways. 
+    
+#### Disabled in unofficial themes
+
+The import button can be tested in an unofficial theme by adding \`test=true\` or \`backend=osm-test\` as [URL-paramter](URL_Parameters.md). 
+The import button will show up then. If in testmode, you can read the changeset-XML directly in the web console.
+In the case that MapComplete is pointed to the testing grounds, the edit will be made on https://master.apis.dev.openstreetmap.org`
     private static knownKeys = ["addExtraTags", "and", "calculatedTags", "changesetmessage", "clustering", "color", "condition", "customCss", "dashArray", "defaultBackgroundId", "description", "descriptionTail", "doNotDownload", "enableAddNewPoints", "enableBackgroundLayerSelection", "enableGeolocation", "enableLayers", "enableMoreQuests", "enableSearch", "enableShareScreen", "enableUserBadge", "freeform", "hideFromOverview", "hideInAnswer", "icon", "iconOverlays", "iconSize", "id", "if", "ifnot", "isShown", "key", "language", "layers", "lockLocation", "maintainer", "mappings", "maxzoom", "maxZoom", "minNeededElements", "minzoom", "multiAnswer", "name", "or", "osmTags", "passAllFeatures", "presets", "question", "render", "roaming", "roamingRenderings", "rotation", "shortDescription", "socialImage", "source", "startLat", "startLon", "startZoom", "tagRenderings", "tags", "then", "title", "titleIcons", "type", "version", "wayHandling", "widenFactor", "width"]
     private static extraKeys = ["nl", "en", "fr", "de", "pt", "es", "name", "phone", "email", "amenity", "leisure", "highway", "building", "yes", "no", "true", "false"]
     private static injectedDownloads = {}
     private static _download_cache = new Map<string, { promise: Promise<any>, timestamp: number }>()
+
+    /**
+     * Parses the arguments for special visualisations
+     */
+    public static ParseVisArgs(specs: { name: string, defaultValue?: string }[], args: string[]): any {
+        const parsed = {};
+        if (args.length > specs.length) {
+            throw "To much arguments for special visualization: got " + args.join(",") + " but expected only " + args.length + " arguments"
+        }
+        for (let i = 0; i < specs.length; i++) {
+            const spec = specs[i];
+            let arg = args[i]?.trim();
+            if (arg === undefined || arg === "") {
+                arg = spec.defaultValue
+            }
+            parsed[spec.name] = arg
+        }
+
+        return parsed;
+    }
 
     static EncodeXmlValue(str) {
         if (typeof str !== "string") {
@@ -92,14 +137,7 @@ Note that these values can be prepare with javascript in the theme by using a [c
     }
 
     public static NoNull<T>(array: T[]): T[] {
-        const ls: T[] = [];
-        for (const t of array) {
-            if (t === undefined || t === null) {
-                continue;
-            }
-            ls.push(t);
-        }
-        return ls;
+        return array?.filter(o => o !== undefined && o !== null)
     }
 
     public static Hist(array: string[]): Map<string, number> {
@@ -144,21 +182,21 @@ Note that these values can be prepare with javascript in the theme by using a [c
         return newArr;
     }
 
-    public static Dupicates(arr: string[]): string[] {
+    public static Dupiclates(arr: string[]): string[] {
         if (arr === undefined) {
             return undefined;
         }
         const newArr = [];
         const seen = new Set<string>();
         for (const string of arr) {
-            if(seen.has(string)){
+            if (seen.has(string)) {
                 newArr.push(string)
             }
             seen.add(string)
         }
         return newArr;
     }
-    
+
     public static Identical<T>(t1: T[], t2: T[], eq?: (t: T, t0: T) => boolean): boolean {
         if (t1.length !== t2.length) {
             return false
@@ -191,7 +229,14 @@ Note that these values can be prepare with javascript in the theme by using a [c
         return [a.substr(0, index), a.substr(index + sep.length)];
     }
 
-    public static SubstituteKeys(txt: string | undefined, tags: any): string | undefined {
+    /**
+     * Given a piece of text, will replace any key occuring in 'tags' by the corresponding value
+     * @param txt
+     * @param tags
+     * @param useLang
+     * @constructor
+     */
+    public static SubstituteKeys(txt: string | undefined, tags: any, useLang?: string): string | undefined {
         if (txt === undefined) {
             return undefined
         }
@@ -202,13 +247,33 @@ Note that these values can be prepare with javascript in the theme by using a [c
         while (match) {
             const key = match[1]
             let v = tags[key]
-            if(v !== undefined ){
-                if(typeof v !== "string"){
-                    v = ""+v
+            if (v !== undefined) {
+
+                if (v["toISOString"] != undefined) {
+                    // This is a date, probably the timestamp of the object
+                    // @ts-ignore
+                    const date: Date = el;
+                    v = date.toISOString()
+                }
+                
+                if (useLang !== undefined && v?.translations !== undefined) {
+                    v = v.translations[useLang] ?? v.translations["*"] ?? (v.textFor !== undefined ? v.textFor(useLang) : v);
+                }
+
+                if (v.InnerConstructElement !== undefined) {
+                    console.warn("SubstituteKeys received a BaseUIElement to substitute in - this is probably a bug and will be downcast to a string\nThe key is", key, "\nThe value is", v)
+                    v = (<HTMLElement>v.InnerConstructElement())?.innerText
+                }
+
+                if (typeof v !== "string") {
+                    v = "" + v
                 }
                 v = v.replace(/\n/g, "<br/>")
+            }else{
+                // v === undefined 
+                v = ""
             }
-            txt = txt.replace("{" + key + "}", v ?? "")
+            txt = txt.replace("{" + key + "}", v)
             match = txt.match(regex)
         }
 
@@ -257,7 +322,7 @@ Note that these values can be prepare with javascript in the theme by using a [c
             }
 
             const sourceV = source[key];
-            if(target === null){
+            if (target === null) {
                 return source
             }
             const targetV = target[key]
@@ -276,6 +341,27 @@ Note that these values can be prepare with javascript in the theme by using a [c
 
         }
         return target;
+    }
+
+    static WalkJson(json: any, f: (v: number | string | boolean | undefined) => any) {
+        if(json === undefined){
+            return f(undefined)
+        }
+        const jtp = typeof json
+        if (jtp === "boolean" || jtp === "string" || jtp === "number"){
+            return f(json)
+        }
+        if (json.map !== undefined) {
+          return json.map(sub => {
+                return Utils.WalkJson(sub, f);
+            })
+        }
+
+        const cp = {...json}
+        for (const key in json) {
+            cp[key] = Utils.WalkJson(json[key], f)
+        }
+        return cp
     }
 
     static getOrSetDefault<K, V>(dict: Map<K, V>, k: K, v: () => V) {
@@ -526,6 +612,18 @@ Note that these values can be prepare with javascript in the theme by using a [c
             osmcha_link = osmcha_link + "," + `"comment":[{"label":"#${theme}","value":"#${theme}"}]`
         }
         return "https://osmcha.org/?filters=" + encodeURIComponent("{" + osmcha_link + "}")
+    }
+
+    /**
+     * Deepclone an object by serializing and deserializing it
+     * @param x
+     * @constructor
+     */
+    static Clone<T>(x: T): T {
+        if (x === undefined) {
+            return undefined;
+        }
+        return JSON.parse(JSON.stringify(x));
     }
 
     private static colorDiff(c0: { r: number, g: number, b: number }, c1: { r: number, g: number, b: number }) {

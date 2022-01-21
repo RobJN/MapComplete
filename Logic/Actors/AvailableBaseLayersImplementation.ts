@@ -22,7 +22,7 @@ export default class AvailableBaseLayersImplementation implements AvailableBaseL
             feature: null,
             max_zoom: 19,
             min_zoom: 0,
-            isBest: false, // This is a lie! Of course OSM is the best map! (But not in this context)
+            isBest: true, // Of course, OpenStreetMap is the best map!
             category: "osmbasedmap"
         }
 
@@ -156,11 +156,12 @@ export default class AvailableBaseLayersImplementation implements AvailableBaseL
 
             const isUpper = urlObj.searchParams["LAYERS"] !== null;
             const options = {
-                maxZoom: maxZoom ?? 19,
+                maxZoom: Math.max(maxZoom ?? 19, 21),
+                maxNativeZoom: maxZoom ?? 19,
                 attribution: attribution + " | ",
                 subdomains: domains,
                 uppercase: isUpper,
-                transparent: false
+                transparent: false,
             };
 
             for (const paramater of paramaters) {
@@ -186,8 +187,9 @@ export default class AvailableBaseLayersImplementation implements AvailableBaseL
         return L.tileLayer(url,
             {
                 attribution: attribution,
-                maxZoom: maxZoom,
-                minZoom: 1,
+                maxZoom: Math.max(21, maxZoom ?? 19),
+                maxNativeZoom: maxZoom ?? 19,
+                minZoom:  1,
                 // @ts-ignore
                 wmts: isWMTS ?? false,
                 subdomains: domains

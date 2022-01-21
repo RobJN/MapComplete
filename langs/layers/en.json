@@ -1,4 +1,78 @@
 {
+    "address": {
+        "description": "Addresses",
+        "name": "Known addresses in OSM",
+        "tagRenderings": {
+            "fixme": {
+                "question": "What should be fixed here? Please explain"
+            },
+            "housenumber": {
+                "mappings": {
+                    "0": {
+                        "then": "This building has no house number"
+                    }
+                },
+                "question": "What is the number of this house?",
+                "render": "The housenumber is <b>{addr:housenumber}</b>"
+            },
+            "street": {
+                "question": "What street is this address located in?",
+                "render": "This address is in street <b>{addr:street}</b>"
+            }
+        },
+        "title": {
+            "render": "Known address"
+        }
+    },
+    "ambulancestation": {
+        "description": "An ambulance station is an area for storage of ambulance vehicles, medical equipment, personal protective equipment, and other medical supplies.",
+        "name": "Map of ambulance stations",
+        "presets": {
+            "0": {
+                "description": "Add an ambulance station to the map",
+                "title": "Ambulance station"
+            }
+        },
+        "tagRenderings": {
+            "ambulance-agency": {
+                "question": "What agency operates this station?",
+                "render": "This station is operated by {operator}."
+            },
+            "ambulance-name": {
+                "question": "What is the name of this ambulance station?",
+                "render": "This station is called {name}."
+            },
+            "ambulance-operator-type": {
+                "mappings": {
+                    "0": {
+                        "then": "The station is operated by the government."
+                    },
+                    "1": {
+                        "then": "The station is operated by a community-based, or informal organization."
+                    },
+                    "2": {
+                        "then": "The station is operated by a formal group of volunteers."
+                    },
+                    "3": {
+                        "then": "The station is privately operated."
+                    }
+                },
+                "question": "How is the station operator classified?",
+                "render": "The operator is a(n) {operator:type} entity."
+            },
+            "ambulance-place": {
+                "question": "Where is the station located? (e.g. name of neighborhood, villlage, or town)",
+                "render": "This station is found within {addr:place}."
+            },
+            "ambulance-street": {
+                "question": " What is the street name where the station located?",
+                "render": "This station is along a highway called {addr:street}."
+            }
+        },
+        "title": {
+            "render": "Ambulance Station"
+        }
+    },
     "artwork": {
         "description": "Diverse pieces of artwork",
         "name": "Artworks",
@@ -139,6 +213,16 @@
                 "question": "How wide is the smallest opening next to the barriers?",
                 "render": "Width of opening: {width:opening} m"
             },
+            "barrier_type": {
+                "mappings": {
+                    "0": {
+                        "then": "This is a single bollard in the road"
+                    },
+                    "1": {
+                        "then": "This is a cycle barrier slowing down cyclists"
+                    }
+                }
+            },
             "bicycle=yes/no": {
                 "mappings": {
                     "0": {
@@ -164,6 +248,7 @@
         }
     },
     "bench": {
+        "description": "A bench is a wooden, metal, stone, ... surface where a human can sit. This layers visualises them and asks a few questions about them.",
         "name": "Benches",
         "presets": {
             "0": {
@@ -254,6 +339,7 @@
         }
     },
     "bench_at_pt": {
+        "description": "A layer showing all public-transport-stops which do have a bench",
         "name": "Benches at public transport stops",
         "tagRenderings": {
             "bench_at_pt-bench_type": {
@@ -332,6 +418,7 @@
         }
     },
     "bicycle_tube_vending_machine": {
+        "description": "A layer showing vending machines for bicycle tubes (either purpose-built bicycle tube vending machines or classical vending machines with bicycle tubes and optionally additional bicycle related objects such as lights, gloves, locks, ...)",
         "name": "Bicycle tube vending machine",
         "presets": {
             "0": {
@@ -360,6 +447,7 @@
         }
     },
     "bike_cafe": {
+        "description": "A bike café is a café geared towards cyclists, for example with services such as a pump, with lots of bicycle-related decoration, ...",
         "name": "Bike cafe",
         "presets": {
             "0": {
@@ -427,6 +515,7 @@
         }
     },
     "bike_cleaning": {
+        "description": "A layer showing facilities where one can clean their bike",
         "name": "Bike cleaning service",
         "presets": {
             "0": {
@@ -475,6 +564,7 @@
         }
     },
     "bike_parking": {
+        "description": "A layer showing where you can park your bike",
         "name": "Bike parking",
         "presets": {
             "0": {
@@ -586,6 +676,7 @@
         }
     },
     "bike_repair_station": {
+        "description": "A layer showing bicycle pumps and bicycle repair tool stands",
         "name": "Bike stations (repair, pump or both)",
         "presets": {
             "0": {
@@ -602,7 +693,7 @@
         },
         "tagRenderings": {
             "Email maintainer": {
-                "render": "<a href='mailto:{email}?subject=Broken bicycle pump&body=Hello,\n\nWith this email, I'd like to inform you that the bicycle pump located at https://mapcomplete.osm.be/cyclofix?lat={_lat}&lon={_lon}&z=18#{id} is broken.'>Report this bicycle pump as broken</a>"
+                "render": "<a href='mailto:{email}?subject=Broken bicycle pump&body=Hello,%0D%0A%0D%0AWith this email, I&#39;d like to inform you that the bicycle pump located at https://mapcomplete.osm.be/cyclofix?lat={_lat}%26lon={_lon}%26z=18%23{id} is broken.%0D%0A%0D%0A Kind regards'>Report this bicycle pump as broken</a>"
             },
             "Operational status": {
                 "mappings": {
@@ -877,6 +968,7 @@
         }
     },
     "bike_themed_object": {
+        "description": "A layer with bike-themed objects but who don't match any other layer",
         "name": "Bike related object",
         "title": {
             "mappings": {
@@ -927,6 +1019,7 @@
         }
     },
     "cafe_pub": {
+        "description": "A layer showing cafés and pubs where one can gather around a drink. The layer asks for some relevant questions",
         "filter": {
             "0": {
                 "options": {
@@ -1030,7 +1123,7 @@
                         "question": "Has a <div style='display: inline-block'><b><b>Tesla Supercharger (destination)</b></b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Tesla-hpwc-model-s.svg'/></div> connector"
                     },
                     "13": {
-                        "question": "Has a <div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> connector"
+                        "question": "Has a <div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> connector"
                     },
                     "14": {
                         "question": "Has a <div style='display: inline-block'><b><b>USB</b> to charge phones and small electronics</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/usb_port.svg'/></div> connector"
@@ -1050,13 +1143,7 @@
                 "title": "charging station with a normal european wall plug <img src='./assets/layers/charging_station/TypeE.svg' style='width: 2rem; height: 2rem; float: left; background: white; border-radius: 1rem; margin-right: 0.5rem'/> (meant to charge electrical bikes)"
             },
             "1": {
-                "title": "charging station for e-bikes"
-            },
-            "2": {
                 "title": "charging station for cars"
-            },
-            "3": {
-                "title": "charging station"
             }
         },
         "tagRenderings": {
@@ -1168,10 +1255,10 @@
                         "then": "<div class='flex'><img class='w-12 mx-4' src='./assets/layers/charging_station/Tesla-hpwc-model-s.svg'/> <span><b>Tesla Supercharger (destination)</b></span></div>"
                     },
                     "24": {
-                        "then": "<div class='flex'><img class='w-12 mx-4' src='./assets/layers/charging_station/Type2_tethered.svg'/> <span><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</span></div>"
+                        "then": "<div class='flex'><img class='w-12 mx-4' src='./assets/layers/charging_station/Type2_tethered.svg'/> <span><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</span></div>"
                     },
                     "25": {
-                        "then": "<div class='flex'><img class='w-12 mx-4' src='./assets/layers/charging_station/Type2_tethered.svg'/> <span><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</span></div>"
+                        "then": "<div class='flex'><img class='w-12 mx-4' src='./assets/layers/charging_station/Type2_tethered.svg'/> <span><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</span></div>"
                     },
                     "26": {
                         "then": "<div class='flex'><img class='w-12 mx-4' src='./assets/layers/charging_station/usb_port.svg'/> <span><b>USB</b> to charge phones and small electronics</span></div>"
@@ -1257,7 +1344,7 @@
             "Type": {
                 "mappings": {
                     "0": {
-                        "then": "<b>Bcycles</b> can be charged here"
+                        "then": "<b>Bicycles</b> can be charged here"
                     },
                     "1": {
                         "then": "<b>Cars</b> can be charged here"
@@ -1345,14 +1432,14 @@
             "current-12": {
                 "mappings": {
                     "0": {
-                        "then": "<div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs at most 16 A"
+                        "then": "<div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs at most 16 A"
                     },
                     "1": {
-                        "then": "<div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs at most 32 A"
+                        "then": "<div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs at most 32 A"
                     }
                 },
-                "question": "What current do the plugs with <div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> offer?",
-                "render": "<div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs at most {socket:tesla_destination:current}A"
+                "question": "What current do the plugs with <div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> offer?",
+                "render": "<div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs at most {socket:tesla_destination:current}A"
             },
             "current-13": {
                 "mappings": {
@@ -1527,8 +1614,8 @@
                 "render": "There are <b class='text-xl'>{socket:tesla_destination}</b> plugs of type <div style='display: inline-block'><b><b>Tesla Supercharger (destination)</b></b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Tesla-hpwc-model-s.svg'/></div> available here"
             },
             "plugs-12": {
-                "question": "How much plugs of type <div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> are available here?",
-                "render": "There are <b class='text-xl'>{socket:tesla_destination}</b> plugs of type <div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> available here"
+                "question": "How much plugs of type <div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> are available here?",
+                "render": "There are <b class='text-xl'>{socket:tesla_destination}</b> plugs of type <div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> available here"
             },
             "plugs-13": {
                 "question": "How much plugs of type <div style='display: inline-block'><b><b>USB</b> to charge phones and small electronics</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/usb_port.svg'/></div> are available here?",
@@ -1622,14 +1709,14 @@
             "power-output-12": {
                 "mappings": {
                     "0": {
-                        "then": "<div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs at most 11 kw"
+                        "then": "<div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs at most 11 kw"
                     },
                     "1": {
-                        "then": "<div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs at most 22 kw"
+                        "then": "<div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs at most 22 kw"
                     }
                 },
-                "question": "What power output does a single plug of type <div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> offer?",
-                "render": "<div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs at most {socket:tesla_destination:output}"
+                "question": "What power output does a single plug of type <div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> offer?",
+                "render": "<div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs at most {socket:tesla_destination:output}"
             },
             "power-output-13": {
                 "mappings": {
@@ -1805,14 +1892,14 @@
             "voltage-12": {
                 "mappings": {
                     "0": {
-                        "then": "<div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs 230 volt"
+                        "then": "<div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs 230 volt"
                     },
                     "1": {
-                        "then": "<div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs 400 volt"
+                        "then": "<div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs 400 volt"
                     }
                 },
-                "question": "What voltage do the plugs with <div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> offer?",
-                "render": "<div style='display: inline-block'><b><b>Tesla supercharger (destination</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs {socket:tesla_destination:voltage} volt"
+                "question": "What voltage do the plugs with <div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> offer?",
+                "render": "<div style='display: inline-block'><b><b>Tesla supercharger (destination)</b> (A Type 2 with cable branded as tesla)</b> <img style='width:1rem; display: inline-block' src='./assets/layers/charging_station/Type2_tethered.svg'/></div> outputs {socket:tesla_destination:voltage} volt"
             },
             "voltage-13": {
                 "mappings": {
@@ -2082,6 +2169,9 @@
                     },
                     "2": {
                         "then": "Zebra crossing"
+                    },
+                    "3": {
+                        "then": "Crossing without crossing markings"
                     }
                 },
                 "question": "What kind of crossing is this?"
@@ -2100,6 +2190,7 @@
         }
     },
     "cycleways_and_roads": {
+        "description": "All infrastructure that someone can cycle over, accompanied with questions about this infrastructure\"",
         "name": "Cycleways and roads",
         "tagRenderings": {
             "Cycleway type for a road": {
@@ -2482,10 +2573,14 @@
         }
     },
     "defibrillator": {
+        "description": "A layer showing defibrillators which can be used in case of emergency. This contains public defibrillators, but also defibrillators which might need staff to fetch the actual device",
         "name": "Defibrillators",
         "presets": {
             "0": {
                 "title": "Defibrillator"
+            },
+            "1": {
+                "title": "defibrillator mounted on a wall"
             }
         },
         "tagRenderings": {
@@ -2610,6 +2705,7 @@
         "name": "Direction visualization"
     },
     "drinking_water": {
+        "description": "A layer showing drinking water fountains",
         "name": "Drinking water",
         "presets": {
             "0": {
@@ -2651,6 +2747,105 @@
             "render": "Drinking water"
         }
     },
+    "entrance": {
+        "description": "A layer showing entrances and offering capabilities to survey some advanced data which is important for e.g. wheelchair users (but also bicycle users, people who want to deliver, ...)",
+        "name": "Entrance",
+        "tagRenderings": {
+            "Door_type": {
+                "mappings": {
+                    "0": {
+                        "then": "The door type is not known"
+                    },
+                    "1": {
+                        "then": "A classical, hinged door supported by joints"
+                    },
+                    "2": {
+                        "then": "A revolving door which hangs on a central shaft, rotating within a cylindrical enclosure"
+                    },
+                    "3": {
+                        "then": "A sliding door where the door slides sidewards, typically parallel with a wall"
+                    },
+                    "4": {
+                        "then": "A door which rolls from overhead, typically seen for garages"
+                    },
+                    "5": {
+                        "then": "This is an entrance without a physical door"
+                    }
+                },
+                "question": "What is the type of this door?<br/><span class='subtle'>Wether or not the door is automated is asked in the next question</span>"
+            },
+            "Entrance type": {
+                "mappings": {
+                    "0": {
+                        "then": "No specific entrance type is known"
+                    },
+                    "1": {
+                        "then": "This is an indoor door, separating a room or a corridor within a single building"
+                    },
+                    "2": {
+                        "then": "This is the main entrance"
+                    },
+                    "3": {
+                        "then": "This is a secondary entrance"
+                    },
+                    "4": {
+                        "then": "This is a service entrance - normally only used for employees, delivery, ..."
+                    },
+                    "5": {
+                        "then": "This is an exit where one can not enter"
+                    },
+                    "6": {
+                        "then": "This is an entrance where one can only enter (but not exit)"
+                    },
+                    "7": {
+                        "then": "This is emergency exit"
+                    },
+                    "8": {
+                        "then": "This is the entrance to a private home"
+                    }
+                },
+                "question": "What type of entrance is this?"
+            },
+            "automatic_door": {
+                "mappings": {
+                    "0": {
+                        "then": "This is an automatic door"
+                    },
+                    "1": {
+                        "then": "This door is <b>not</b> automated"
+                    },
+                    "2": {
+                        "then": "This door will open automatically when <b>motion</b> is detected"
+                    },
+                    "3": {
+                        "then": "This door will open automatically when a <b>sensor in the floor</b> is triggered"
+                    },
+                    "4": {
+                        "then": "This door will open automatically when a <b>button is pressed</b>"
+                    },
+                    "5": {
+                        "then": "This door revolves automatically all the time, but has a <b>button to slow it down</b>, e.g. for wheelchair users"
+                    },
+                    "6": {
+                        "then": "This door revolves automatically all the time"
+                    },
+                    "7": {
+                        "then": "This door will be opened by staff when requested by <b>pressing a button</b"
+                    },
+                    "8": {
+                        "then": "This door will be opened by staff when requested"
+                    }
+                }
+            },
+            "width": {
+                "question": "What is the width of this door/entrance?",
+                "render": "This door has a width of {canonical(width)} meter"
+            }
+        },
+        "title": {
+            "render": "Entrance"
+        }
+    },
     "etymology": {
         "description": "All objects which have an etymology known",
         "name": "Has etymolgy",
@@ -2682,7 +2877,89 @@
             }
         }
     },
+    "extinguisher": {
+        "description": "Map layer to show fire hydrants.",
+        "name": "Map of fire extinguishers.",
+        "presets": {
+            "0": {
+                "description": "A fire extinguisher is a small, portable device used to stop a fire",
+                "title": "Fire extinguisher"
+            }
+        },
+        "tagRenderings": {
+            "extinguisher-location": {
+                "mappings": {
+                    "0": {
+                        "then": "Found indoors."
+                    },
+                    "1": {
+                        "then": "Found outdoors."
+                    }
+                },
+                "question": "Where is it positioned?",
+                "render": "Location: {location}"
+            }
+        },
+        "title": {
+            "render": "Extinguishers"
+        }
+    },
+    "fire_station": {
+        "description": "Map layer to show fire stations.",
+        "name": "Map of fire stations",
+        "presets": {
+            "0": {
+                "description": "A fire station is a place where the fire trucks and firefighters are located when not in operation.",
+                "title": "Fire station"
+            }
+        },
+        "tagRenderings": {
+            "station-agency": {
+                "mappings": {
+                    "0": {
+                        "then": "Bureau of Fire Protection"
+                    }
+                },
+                "question": "What agency operates this station?",
+                "render": "This station is operated by {operator}."
+            },
+            "station-name": {
+                "question": "What is the name of this fire station?",
+                "render": "This station is called {name}."
+            },
+            "station-operator": {
+                "mappings": {
+                    "0": {
+                        "then": "The station is operated by the government."
+                    },
+                    "1": {
+                        "then": "The station is operated by a community-based, or informal organization."
+                    },
+                    "2": {
+                        "then": "The station is operated by a formal group of volunteers."
+                    },
+                    "3": {
+                        "then": "The station is privately operated."
+                    }
+                },
+                "question": "How is the station operator classified?",
+                "render": "The operator is a(n) {operator:type} entity."
+            },
+            "station-place": {
+                "question": "Where is the station located? (e.g. name of neighborhood, villlage, or town)",
+                "render": "This station is found within {addr:place}."
+            },
+            "station-street": {
+                "question": " What is the street name where the station located?",
+                "render": "This station is along a highway called {addr:street}."
+            }
+        },
+        "title": {
+            "render": "Fire Station"
+        }
+    },
     "food": {
+        "description": "A layer showing restaurants and fast-food amenities (with a special rendering for friteries)",
         "filter": {
             "0": {
                 "options": {
@@ -2811,6 +3088,7 @@
         }
     },
     "ghost_bike": {
+        "description": "A layer showing memorials for cyclists, killed in road accidents",
         "name": "Ghost bikes",
         "presets": {
             "0": {
@@ -2859,7 +3137,76 @@
             }
         }
     },
+    "grass_in_parks": {
+        "description": "Searches for all accessible grass patches within public parks - these are 'groenzones'\""
+    },
+    "hydrant": {
+        "description": "Map layer to show fire hydrants.",
+        "name": "Map of hydrants",
+        "presets": {
+            "0": {
+                "description": "A hydrant is a connection point where firefighters can tap water. It might be located underground.",
+                "title": "Fire hydrant"
+            }
+        },
+        "tagRenderings": {
+            "hydrant-color": {
+                "mappings": {
+                    "0": {
+                        "then": "The hydrant color is unknown."
+                    },
+                    "1": {
+                        "then": "The hydrant color is yellow."
+                    },
+                    "2": {
+                        "then": "The hydrant color is red."
+                    }
+                },
+                "question": "What color is the hydrant?",
+                "render": "The hydrant color is {colour}"
+            },
+            "hydrant-state": {
+                "mappings": {
+                    "0": {
+                        "then": "The hydrant is (fully or partially) working"
+                    },
+                    "1": {
+                        "then": "The hydrant is unavailable"
+                    },
+                    "2": {
+                        "then": "The hydrant has been removed"
+                    }
+                },
+                "question": "Is this hydrant still working?"
+            },
+            "hydrant-type": {
+                "mappings": {
+                    "0": {
+                        "then": "The hydrant type is unknown."
+                    },
+                    "1": {
+                        "then": "<img style=\"width:15px\" src=\"./assets/themes/hailhydrant/hydrant_pillar.svg\" /> Pillar type."
+                    },
+                    "2": {
+                        "then": "<img style=\"width:15px\" src=\"./assets/themes/hailhydrant/hydrant_unknown.svg\" /> Pipe type."
+                    },
+                    "3": {
+                        "then": "<img style=\"width:15px\" src=\"./assets/themes/hailhydrant/hydrant_unknown.svg\" /> Wall type."
+                    },
+                    "4": {
+                        "then": "<img style=\"width:15px\" src=\"./assets/themes/hailhydrant/hydrant_underground.svg\" /> Underground type."
+                    }
+                },
+                "question": "What type of hydrant is it?",
+                "render": " Hydrant type: {fire_hydrant:type}"
+            }
+        },
+        "title": {
+            "render": "Hydrant"
+        }
+    },
     "information_board": {
+        "description": "A layer showing touristical, road side information boards (e.g. giving information about the landscape, a building, a feature, a map, ...)",
         "name": "Information boards",
         "presets": {
             "0": {
@@ -2950,6 +3297,89 @@
             }
         }
     },
+    "note": {
+        "filter": {
+            "0": {
+                "options": {
+                    "0": {
+                        "question": "Should mention {search} in the first comment"
+                    }
+                }
+            },
+            "1": {
+                "options": {
+                    "0": {
+                        "question": "Should <b>not</b> mention {search} in the first comment"
+                    }
+                }
+            },
+            "2": {
+                "options": {
+                    "0": {
+                        "question": "Opened by {search}"
+                    }
+                }
+            },
+            "3": {
+                "options": {
+                    "0": {
+                        "question": "<b>Not</b> opened by {search}"
+                    }
+                }
+            },
+            "4": {
+                "options": {
+                    "0": {
+                        "question": "Opened before {search}"
+                    }
+                }
+            },
+            "5": {
+                "options": {
+                    "0": {
+                        "question": "Opened after {search}"
+                    }
+                }
+            },
+            "6": {
+                "options": {
+                    "0": {
+                        "question": "Opened by anonymous user"
+                    }
+                }
+            },
+            "7": {
+                "options": {
+                    "0": {
+                        "question": "Only show open notes"
+                    }
+                }
+            }
+        },
+        "name": "OpenStreetMap notes",
+        "tagRenderings": {
+            "report-contributor": {
+                "render": "<a href='https://www.openstreetmap.org/reports/new?reportable_id={_first_user_id}&reportable_type=User' target='_blank' class='subtle'>Report {_first_user} as spam</a>"
+            },
+            "report-note": {
+                "render": "<a href='https://www.openstreetmap.org/reports/new?reportable_id={id}&reportable_type=Note' target='_blank'>Report this note as spam or inappropriate</a>"
+            }
+        },
+        "title": {
+            "mappings": {
+                "0": {
+                    "then": "Closed note"
+                }
+            },
+            "render": "Note"
+        }
+    },
+    "note_import": {
+        "name": "Possible bookcases",
+        "title": {
+            "render": "Possible feature"
+        }
+    },
     "observation_tower": {
         "description": "Towers with a panoramic view",
         "name": "Observation towers",
@@ -3014,6 +3444,10 @@
         "title": {
             "render": "Car parking"
         }
+    },
+    "pedestrian_path": {
+        "description": "Pedestrian footpaths, especially used for indoor navigation and snapping entrances to this layer",
+        "name": "Pedestrain paths"
     },
     "picnic_table": {
         "description": "The layer showing picnic tables",
@@ -3352,6 +3786,7 @@
         }
     },
     "slow_roads": {
+        "description": "All carfree roads",
         "tagRenderings": {
             "slow_roads-surface": {
                 "mappings": {
@@ -3495,6 +3930,7 @@
         }
     },
     "street_lamps": {
+        "description": "A layer showing street lights",
         "name": "Street Lamps",
         "presets": {
             "0": {
@@ -3643,7 +4079,16 @@
         }
     },
     "surveillance_camera": {
+        "description": "This layer shows surveillance cameras and allows a contributor to update information and add new cameras",
         "name": "Surveillance camera's",
+        "presets": {
+            "0": {
+                "title": "surveillance camera"
+            },
+            "1": {
+                "title": "surveillance camera mounted on a wall"
+            }
+        },
         "tagRenderings": {
             "Camera type: fixed; panning; dome": {
                 "mappings": {
@@ -3749,6 +4194,7 @@
         }
     },
     "toilet": {
+        "description": "A layer showing (public) toilets",
         "filter": {
             "0": {
                 "options": {
@@ -3782,8 +4228,7 @@
         "name": "Toilets",
         "presets": {
             "0": {
-                "description": "A publicly accessible toilet or restroom",
-                "title": "toilet"
+                "title": "public toilet"
             },
             "1": {
                 "description": "A restroom which has at least one wheelchair-accessible toilet",
@@ -3947,6 +4392,7 @@
         }
     },
     "tree_node": {
+        "description": "A layer showing trees",
         "name": "Tree",
         "presets": {
             "0": {
@@ -4089,6 +4535,9 @@
             "render": "Viewpoint"
         }
     },
+    "village_green": {
+        "description": "A layer showing village-green (which are communal green areas, but not quite parks\""
+    },
     "visitor_information_centre": {
         "description": "A visitor center offers information about a specific attraction or place of interest where it is located.",
         "name": "Visitor Information Centre",
@@ -4099,6 +4548,12 @@
                 }
             },
             "render": "{name}"
+        }
+    },
+    "walls_and_buildings": {
+        "description": "Special builtin layer providing all walls and buildings. This layer is useful in presets for objects which can be placed against walls (e.g. AEDs, postboxes, entrances, addresses, surveillance cameras, ...). This layer is invisible by default and not toggleable by the user.",
+        "title": {
+            "render": "Wall or building"
         }
     },
     "waste_basket": {

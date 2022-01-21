@@ -38,4 +38,8 @@ export default class Minimap {
         throw "CreateMinimap hasn't been initialized yet. Please call MinimapImplementation.initialize()"
     }
 
+    private constructor() {
+    }
+
+
 }

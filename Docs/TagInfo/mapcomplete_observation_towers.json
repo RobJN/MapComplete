@@ -53,17 +53,21 @@
       "description": "Layer 'Observation towers' shows and asks freeform values for key 'website' (in the MapComplete.osm.be theme 'Observation towers')"
     },
     {
+      "key": "contact:website",
+      "description": "Layer 'Observation towers' shows contact:website~^..*$ with a fixed text, namely '<a href='{contact:website}' target='_blank'>{contact:website}</a>' (in the MapComplete.osm.be theme 'Observation towers')"
+    },
+    {
       "key": "charge",
       "description": "Layer 'Observation towers' shows and asks freeform values for key 'charge' (in the MapComplete.osm.be theme 'Observation towers')"
     },
     {
       "key": "fee",
-      "description": "Layer 'Observation towers' shows fee=no&charge= with a fixed text, namely 'Free to visit' and allows to pick this as a default answer (in the MapComplete.osm.be theme 'Observation towers')",
+      "description": "Layer 'Observation towers' shows fee=no with a fixed text, namely 'Free to visit' and allows to pick this as a default answer (in the MapComplete.osm.be theme 'Observation towers')",
       "value": "no"
     },
     {
       "key": "charge",
-      "description": "Layer 'Observation towers' shows fee=no&charge= with a fixed text, namely 'Free to visit' and allows to pick this as a default answer (in the MapComplete.osm.be theme 'Observation towers') Picking this answer will delete the key charge.",
+      "description": "Layer 'Observation towers' shows fee=no with a fixed text, namely 'Free to visit' and allows to pick this as a default answer (in the MapComplete.osm.be theme 'Observation towers') Picking this answer will delete the key charge.",
       "value": ""
     },
     {
@@ -102,8 +106,13 @@
     },
     {
       "key": "wikidata",
-      "description": "Layer 'Observation towers' shows wikidata= with a fixed text, namely 'No Wikipedia page has been linked yet' (in the MapComplete.osm.be theme 'Observation towers') Picking this answer will delete the key wikidata.",
+      "description": "Layer 'Observation towers' shows  with a fixed text, namely 'No Wikipedia page has been linked yet' (in the MapComplete.osm.be theme 'Observation towers') Picking this answer will delete the key wikidata.",
       "value": ""
+    },
+    {
+      "key": "id",
+      "description": "The MapComplete theme Observation towers has a layer Your track showing features with this tag",
+      "value": "location_track"
     }
   ]
 }

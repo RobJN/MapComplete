@@ -3,7 +3,6 @@ import {OsmNode, OsmRelation, OsmWay} from "../../Osm/OsmObject";
 import FeatureSource from "../FeatureSource";
 import {UIEventSource} from "../../UIEventSource";
 import {ChangeDescription} from "../../Osm/Actions/ChangeDescription";
-import State from "../../../State";
 
 export class NewGeometryFromChangesFeatureSource implements FeatureSource {
     // This class name truly puts the 'Java' into 'Javascript'
@@ -14,7 +13,7 @@ export class NewGeometryFromChangesFeatureSource implements FeatureSource {
     public readonly features: UIEventSource<{ feature: any; freshness: Date }[]> = new UIEventSource<{ feature: any; freshness: Date }[]>([]);
     public readonly name: string = "newFeatures";
 
-    constructor(changes: Changes) {
+    constructor(changes: Changes, backendUrl: string) {
 
         const seenChanges = new Set<ChangeDescription>();
         const features = this.features.data;
@@ -43,7 +42,6 @@ export class NewGeometryFromChangesFeatureSource implements FeatureSource {
                         feature: feature,
                         freshness: now
                     })
-                    console.warn("Added a new feature: ", JSON.stringify(feature))
                 }
 
                 for (const change of changes) {
@@ -55,7 +53,7 @@ export class NewGeometryFromChangesFeatureSource implements FeatureSource {
                         }
                         tags["id"] = change.type + "/" + change.id
 
-                        tags["_backend"] = State.state.osmConnection._oauth_config.url
+                        tags["_backend"] = backendUrl
 
                         switch (change.type) {
                             case "node":

@@ -7,6 +7,11 @@ import {And} from "../../Logic/Tags/And";
 import ValidatedTextField from "../../UI/Input/ValidatedTextField";
 import {Utils} from "../../Utils";
 import {Tag} from "../../Logic/Tags/Tag";
+import BaseUIElement from "../../UI/BaseUIElement";
+import Combine from "../../UI/Base/Combine";
+import Title from "../../UI/Base/Title";
+import Link from "../../UI/Base/Link";
+import List from "../../UI/Base/List";
 
 /***
  * The parsed version of TagRenderingConfigJSON
@@ -40,7 +45,6 @@ export default class TagRenderingConfig {
         readonly hideInAnswer: boolean | TagsFilter
         readonly addExtraTags: Tag[]
     }[]
-
     constructor(json: string | TagRenderingConfigJson, context?: string) {
         if (json === undefined) {
             throw "Initing a TagRenderingConfig with undefined in " + context;
@@ -58,9 +62,8 @@ export default class TagRenderingConfig {
 
 
         if (typeof json === "number") {
-            json = ""+json
+            json = "" + json
         }
-
 
 
         if (typeof json === "string") {
@@ -70,13 +73,12 @@ export default class TagRenderingConfig {
         }
 
 
-        this.id = json.id ?? "";
-        if(this.id.match(/^[a-zA-Z0-9 ()?\/=:;,_-]*$/) === null){
-            throw "Invalid ID in "+context+": an id can only contain [a-zA-Z0-0_-] as characters. The offending id is: "+this.id
+        this.id = json.id ?? ""; // Some tagrenderings - especially for the map rendering - don't need an ID
+        if (this.id.match(/^[a-zA-Z0-9 ()?\/=:;,_-]*$/) === null) {
+            throw "Invalid ID in " + context + ": an id can only contain [a-zA-Z0-0_-] as characters. The offending id is: " + this.id
         }
-        
-        
-        
+
+
         this.group = json.group ?? "";
         this.render = Translations.T(json.render, context + ".render");
         this.question = Translations.T(json.question, context + ".question");
@@ -106,15 +108,15 @@ export default class TagRenderingConfig {
                 throw `Freeform.args is defined. This should probably be 'freeform.helperArgs' (at ${context})`
 
             }
-            
-            if(json.freeform.key === "questions"){
-                if(this.id !== "questions"){
+
+            if (json.freeform.key === "questions") {
+                if (this.id !== "questions") {
                     throw `If you use a freeform key 'questions', the ID must be 'questions' too to trigger the special behaviour. The current id is '${this.id}' (at ${context})`
                 }
             }
 
 
-            if (ValidatedTextField.AllTypes[this.freeform.type] === undefined) {
+            if (!ValidatedTextField.AllTypes.has(this.freeform.type)) {
                 const knownKeys = ValidatedTextField.tpList.map(tp => tp.name).join(", ");
                 throw `Freeform.key ${this.freeform.key} is an invalid type. Known keys are ${knownKeys}`
             }
@@ -187,51 +189,50 @@ export default class TagRenderingConfig {
 
         if (this.id === "questions" && this.render !== undefined) {
             for (const ln in this.render.translations) {
-                const txt :string = this.render.translations[ln]
-                if(txt.indexOf("{questions}") >= 0){
+                const txt: string = this.render.translations[ln]
+                if (txt.indexOf("{questions}") >= 0) {
                     continue
                 }
                 throw `${context}: The rendering for language ${ln} does not contain {questions}. This is a bug, as this rendering should include exactly this to trigger those questions to be shown!`
 
             }
-            if(this.freeform?.key !== undefined && this.freeform?.key !== "questions"){
+            if (this.freeform?.key !== undefined && this.freeform?.key !== "questions") {
                 throw `${context}: If the ID is questions to trigger a question box, the only valid freeform value is 'questions' as well. Set freeform to questions or remove the freeform all together`
             }
         }
 
 
         if (this.freeform) {
-            if(this.render === undefined){
+            if (this.render === undefined) {
                 throw `${context}: Detected a freeform key without rendering... Key: ${this.freeform.key} in ${context}`
             }
             for (const ln in this.render.translations) {
-                const txt :string = this.render.translations[ln]
-                if(txt === ""){
-                    throw context+" Rendering for language "+ln+" is empty"
+                const txt: string = this.render.translations[ln]
+                if (txt === "") {
+                    throw context + " Rendering for language " + ln + " is empty"
                 }
-                if(txt.indexOf("{"+this.freeform.key+"}") >= 0){
+                if (txt.indexOf("{" + this.freeform.key + "}") >= 0) {
                     continue
                 }
-                if(txt.indexOf("{"+this.freeform.key+":") >= 0){
+                if (txt.indexOf("{" + this.freeform.key + ":") >= 0) {
                     continue
                 }
-                if(txt.indexOf("{canonical("+this.freeform.key+")") >= 0){
+                if (txt.indexOf("{canonical(" + this.freeform.key + ")") >= 0) {
                     continue
                 }
-                if(this.freeform.type === "opening_hours" && txt.indexOf("{opening_hours_table(") >= 0){
+                if (this.freeform.type === "opening_hours" && txt.indexOf("{opening_hours_table(") >= 0) {
                     continue
                 }
-                if(this.freeform.type === "wikidata" && txt.indexOf("{wikipedia("+this.freeform.key) >= 0){
+                if (this.freeform.type === "wikidata" && txt.indexOf("{wikipedia(" + this.freeform.key) >= 0) {
                     continue
                 }
-                if(this.freeform.key === "wikidata" && txt.indexOf("{wikipedia()") >= 0){
+                if (this.freeform.key === "wikidata" && txt.indexOf("{wikipedia()") >= 0) {
                     continue
                 }
                 throw `${context}: The rendering for language ${ln} does not contain the freeform key {${this.freeform.key}}. This is a bug, as this rendering should show exactly this freeform key!\nThe rendering is ${txt} `
-                
+
             }
         }
-
 
 
         if (this.render && this.question && this.freeform === undefined) {
@@ -372,12 +373,15 @@ export default class TagRenderingConfig {
                     return mapping.then;
                 }
                 if (mapping.if.matchesProperties(tags)) {
+                    if(this.id === "uk_addresses_placename"){
+                    console.log("Matched",mapping.if,"with ",tags["addr:place"])
+                    }
                     return mapping.then;
                 }
             }
         }
 
-        if(this.id === "questions"){
+        if (this.id === "questions") {
             return this.render
         }
 
@@ -389,6 +393,26 @@ export default class TagRenderingConfig {
             return this.render;
         }
         return defltValue;
+    }
+
+    /**
+     * Gets all translations that might be rendered in all languages
+     * USed for static analysis
+     * @constructor
+     * @private
+     */
+    EnumerateTranslations(): Translation[] {
+        const translations: Translation[] = []
+        for (const key in this) {
+            if (!this.hasOwnProperty(key)) {
+                continue;
+            }
+            const o = this[key]
+            if (o instanceof Translation) {
+                translations.push(o)
+            }
+        }
+        return translations;
     }
 
     public ExtractImages(isIcon: boolean): Set<string> {
@@ -403,5 +427,84 @@ export default class TagRenderingConfig {
         return usedIcons;
     }
 
+    FreeformValues(): { key: string, type?: string, values?: string [] } {
+        try {
 
+            const key = this.freeform?.key
+            const answerMappings = this.mappings?.filter(m => m.hideInAnswer !== true)
+            if (key === undefined) {
+
+                let values: { k: string, v: string }[][] = Utils.NoNull(answerMappings?.map(m => m.if.asChange({})) ?? [])
+                if (values.length === 0) {
+                    return;
+                }
+
+                const allKeys = values.map(arr => arr.map(o => o.k))
+                let common = allKeys[0];
+                for (const keyset of allKeys) {
+                    common = common.filter(item => keyset.indexOf(item) >= 0)
+                }
+                const commonKey = common[0]
+                if (commonKey === undefined) {
+                    return undefined;
+                }
+                return {
+                    key: commonKey,
+                    values: Utils.NoNull(values.map(arr => arr.filter(item => item.k === commonKey)[0]?.v))
+                }
+
+            }
+
+            let values = Utils.NoNull(answerMappings?.map(m => m.if.asChange({}).filter(item => item.k === key)[0]?.v) ?? [])
+            if (values.length === undefined) {
+                values = undefined
+            }
+            return {
+                key,
+                type: this.freeform.type,
+                values
+            }
+        } catch (e) {
+            console.error("Could not create FreeformValues for tagrendering", this.id)
+            return undefined
+        }
+    }
+
+    GenerateDocumentation(): BaseUIElement {
+
+        let withRender: (BaseUIElement | string)[] = [];
+        if (this.freeform?.key !== undefined) {
+            withRender = [
+                `This rendering asks information about the property `,
+                Link.OsmWiki(this.freeform.key),
+                `\nThis is rendered with \`${this.render.txt}\``
+
+            ]
+        }
+
+        let mappings: BaseUIElement = undefined;
+        if (this.mappings !== undefined) {
+            mappings = new List(
+                this.mappings.map(m => {
+                        let txt = "**" + m.then.txt + "** corresponds with " + m.if.asHumanString(true, false, {});
+                        if(m.hideInAnswer === true)
+                        {
+                            txt += "_This option cannot be chosen as answer_"
+                        }
+                        if(m.ifnot !== undefined){
+                            txt += "Unselecting this answer will add "+m.ifnot.asHumanString(true, false, {})
+                        }
+                        return txt;
+                    }
+                )
+            )
+        }
+
+        return new Combine([
+            new Title(this.id, 3),
+            this.question !== undefined ? "The question is **" + this.question.txt + "**" : "_This tagrendering has no question and is thus read-only_",
+            new Combine(withRender),
+            mappings
+        ]).SetClass("flex-col");
+    }
 }
